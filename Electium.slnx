@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Electium.Application/Electium.Application.csproj" Id="cec8c02a-ef9d-4601-8ef6-7aedd154ceab" />
+  <Project Path="Electium.Domain/Electium.Domain.csproj" />
+  <Project Path="Electium.Infrastructure/Electium.Infrastructure.csproj" Id="d5fc3caa-df2e-4e82-83a3-12577e34d333" />
+  <Project Path="Electium.Shared/Electium.Shared.csproj" Id="187d0b75-df5c-4179-aab1-42855f0658e3" />
+  <Project Path="Electium.Web/Electium.Web.csproj" Id="abc4b63e-61e9-499d-8282-24c6a553cc9a" />
+</Solution>
