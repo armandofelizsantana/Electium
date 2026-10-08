@@ -2,6 +2,9 @@ using Electium.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Electium.Application.Interfaces;
 using Electium.Infrastructure.Repositories;
+using Electium.Application.Mapping;
+using Electium.Application.Services;
+using Electium.Web.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,22 @@ builder.Services.AddScoped(
     typeof(GenericRepository<>));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(CitizenMappingProfile).Assembly);
+
+builder.Services.AddScoped(
+    typeof(IGenericService<,,,>),
+    typeof(GenericService<,,,>));
+
+builder.Services.AddAutoMapper(
+    cfg => { },
+    typeof(CitizenMappingProfile),
+    typeof(CitizenWebMappingProfile));
+
+builder.Services.AddScoped<ICitizenRepository, CitizenRepository>();
+builder.Services.AddScoped<ICitizenService, CitizenService>();
 
 var app = builder.Build();
 
