@@ -46,6 +46,17 @@ builder.Services.AddAutoMapper(
 builder.Services.AddScoped<ICitizenRepository, CitizenRepository>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 
+builder.Services.AddScoped<IElectivePositionService,
+    ElectivePositionService>();
+
+builder.Services.AddScoped<IElectivePositionRepository,
+    ElectivePositionRepository>();
+
+builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
+
+builder.Services.AddScoped<IElectionService, ElectionService>();
+
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     {
         options.User.RequireUniqueEmail = true;
@@ -62,6 +73,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<
     IAuthenticationService,
     IdentityAuthenticationService>();
+
+
 
 var app = builder.Build();
 

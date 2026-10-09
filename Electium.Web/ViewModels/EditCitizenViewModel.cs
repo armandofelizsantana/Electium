@@ -14,8 +14,8 @@ public class EditCitizenViewModel
     [StringLength(50)]
     public string LastName { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
-    [EmailAddress(ErrorMessage = "Escribe un correo electrónico válido.")]
+    [Required(ErrorMessage = "El correo electronico es obligatorio.")]
+    [EmailAddress(ErrorMessage = "Escribe un correo electrónico valido.")]
     [StringLength(50)]
     public string Email { get; set; } = string.Empty;
 

@@ -1,0 +1,158 @@
+﻿@model IEnumerable<Electium.Web.ViewModels.ElectivePositionListViewModel>
+
+@{
+    ViewData["Title"] = "Puestos electivos";
+
+    var successMessage = TempData["Success"] as string;
+    var errorMessage = TempData["Error"] as string;
+    var toastMessage = successMessage ?? errorMessage;
+    var toastClass = successMessage is not null
+        ? "electium-toast-success"
+        : "electium-toast-error";
+}
+
+<style>
+    .electium-toast {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: min(26rem, calc(100vw - 2rem));
+        padding: 1rem;
+        color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .electium-toast-success {
+        background-color: #198754;
+    }
+
+    .electium-toast-error {
+        background-color: #dc3545;
+    }
+
+    .electium-toast.is-hiding {
+        opacity: 0;
+        transform: translateY(-0.75rem);
+        pointer-events: none;
+    }
+
+    .electium-toast-content {
+        flex: 1;
+    }
+
+    .electium-toast-close {
+        padding: 0 0.25rem;
+        color: white;
+        background: transparent;
+        border: 0;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+</style>
+
+<h1>Puestos electivos</h1>
+
+@if (!string.IsNullOrWhiteSpace(toastMessage))
+{
+    <div id="electium-toast"
+         class="electium-toast @toastClass"
+         role="status"
+         aria-live="polite">
+        <div class="electium-toast-content">
+            <strong>
+                @(successMessage is not null
+                    ? "Operación completada"
+                    : "No se pudo completar")
+            </strong>
+            <div>@toastMessage</div>
+        </div>
+
+        <button type="button"
+                class="electium-toast-close"
+                aria-label="Cerrar aviso">
+            &times;
+        </button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear puesto</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var position in Model)
+        {
+            <tr>
+                <td>@position.Name</td>
+                <td>@position.Description</td>
+                <td>
+                    @(position.IsActive ? "Activo" : "Inactivo")
+                </td>
+                <td>
+                    <a asp-action="Edit"
+                       asp-route-id="@position.Id"
+                       class="btn btn-sm btn-warning">
+                        Editar
+                    </a>
+
+                    <form asp-action="SetActive"
+                          asp-route-id="@position.Id"
+                          method="post"
+                          class="d-inline">
+                        <button type="submit"
+                                name="isActive"
+                                value="@(position.IsActive ? "false" : "true")"
+                                class="btn btn-sm @(position.IsActive ? "btn-secondary" : "btn-success")">
+                            @(position.IsActive ? "Desactivar" : "Activar")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    (() => {
+        const toast = document.getElementById("electium-toast");
+
+        if (!toast) {
+            return;
+        }
+
+        const dismissToast = () => {
+            if (toast.classList.contains("is-hiding")) {
+                return;
+            }
+
+            toast.classList.add("is-hiding");
+
+            window.setTimeout(() => {
+                toast.remove();
+            }, 500);
+        };
+
+        const closeButton = toast.querySelector(".electium-toast-close");
+        closeButton.addEventListener("click", dismissToast);
+
+        window.setTimeout(dismissToast, 3500);
+    })();
+</script>

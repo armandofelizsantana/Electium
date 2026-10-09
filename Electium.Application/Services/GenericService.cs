@@ -62,7 +62,7 @@ public class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>
         return _mapper.Map<TDto>(entity);
     }
 
-    public async virtual Task<TDto?> UpdateAsync(
+    public virtual async Task<TDto?> UpdateAsync(
         int id,
         TUpdateDto dto,
         CancellationToken cancellationToken = default)
@@ -82,7 +82,7 @@ public class GenericService<TEntity, TDto, TCreateDto, TUpdateDto>
         return _mapper.Map<TDto>(entity);
     }
 
-    public async Task<bool> SetActiveAsync(
+    public virtual async Task<bool> SetActiveAsync(
         int id,
         bool isActive,
         CancellationToken cancellationToken = default)
