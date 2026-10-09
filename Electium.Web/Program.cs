@@ -7,6 +7,9 @@ using Electium.Application.Services;
 using Electium.Web.Mapping;
 using Electium.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Electium.Web.Data;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,15 +46,26 @@ builder.Services.AddAutoMapper(
 builder.Services.AddScoped<ICitizenRepository, CitizenRepository>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
 
-builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
     {
         options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<ElectiumDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+builder.Services.AddScoped<
+    IAuthenticationService,
+    IdentityAuthenticationService>();
+
 var app = builder.Build();
+
+await IdentitySeeder.SeedAsync(app.Services, app.Configuration);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

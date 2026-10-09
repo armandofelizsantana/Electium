@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,4 +25,8 @@
     <ProjectReference Include="..\Electium.Domain\Electium.Domain.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	
 </Project>

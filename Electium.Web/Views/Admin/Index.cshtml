@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Inicio del administrador";
+}
+
+<h1>Inicio del administrador</h1>
+<p>La sesión de administrador esta activa.</p>
+
+<form asp-controller="Account" asp-action="Logout" method="post">
+    <button type="submit" class="btn btn-outline-secondary">
+        Cerrar sesion
+    </button>
+</form>
