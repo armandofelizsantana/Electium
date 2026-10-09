@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using Electium.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Electium.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Electium.Infrastructure.Persistence
 {
-    public class ElectiumDbContext : DbContext
+    public class ElectiumDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         public ElectiumDbContext(DbContextOptions<ElectiumDbContext> options)
             : base(options)

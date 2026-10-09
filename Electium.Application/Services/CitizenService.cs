@@ -62,7 +62,7 @@ public class CitizenService
         if (citizen is null)
         {
             return null;
-        }
+        }   
 
         var alreadyExists =
             await _citizenRepository.IdentityNumberExistsAsync(
