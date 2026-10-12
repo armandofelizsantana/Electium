@@ -8,59 +8,34 @@ public class ElectionWebMappingProfile : Profile
 {
     public ElectionWebMappingProfile()
     {
-        CreateMap<ElectionDto, ElectionListViewModel>()
+        CreateMap<ElectionSummaryDto, ElectionListViewModel>()
             .ForMember(
-                destination => destination.StartsAtLocal,
+                destination => destination.ElectionDateLocal,
                 options => options.MapFrom(
-                    source => source.StartsAtUtc.ToLocalTime()))
-            .ForMember(
-                destination => destination.EndsAtLocal,
-                options => options.MapFrom(
-                    source => source.EndsAtUtc.HasValue
-                        ? source.EndsAtUtc.Value.ToLocalTime()
-                        : (DateTime?)null));
-
-        CreateMap<ElectionDto, EditElectionViewModel>()
-            .ForMember(
-                destination => destination.StartsAtLocal,
-                options => options.MapFrom(
-                    source => source.StartsAtUtc.ToLocalTime()))
-            .ForMember(
-                destination => destination.EndsAtLocal,
-                options => options.MapFrom(
-                    source => source.EndsAtUtc.HasValue
-                        ? source.EndsAtUtc.Value.ToLocalTime()
-                        : (DateTime?)null));
+                    source => source.StartsAtUtc.ToLocalTime().Date));
 
         CreateMap<CreateElectionViewModel, CreateElectionDto>()
             .ForMember(
+                destination => destination.Year,
+                options => options.MapFrom(
+                    source => source.ElectionDateLocal!.Value.Year))
+            .ForMember(
                 destination => destination.StartsAtUtc,
                 options => options.MapFrom(
-                    source => ToUtc(source.StartsAtLocal!.Value)))
+                    source => ToUtc(source.ElectionDateLocal!.Value.Date)))
             .ForMember(
                 destination => destination.EndsAtUtc,
-                options => options.MapFrom(
-                    source => source.EndsAtLocal.HasValue
-                        ? ToUtc(source.EndsAtLocal.Value)
-                        : (DateTime?)null));
+                options => options.Ignore());
 
-        CreateMap<EditElectionViewModel, UpdateElectionDto>()
-            .ForMember(
-                destination => destination.StartsAtUtc,
-                options => options.MapFrom(
-                    source => ToUtc(source.StartsAtLocal!.Value)))
-            .ForMember(
-                destination => destination.EndsAtUtc,
-                options => options.MapFrom(
-                    source => source.EndsAtLocal.HasValue
-                        ? ToUtc(source.EndsAtLocal.Value)
-                        : (DateTime?)null));
+        CreateMap<ElectionResultsDto, ElectionResultsViewModel>();
+        CreateMap<ElectionPositionResultDto, ElectionPositionResultViewModel>();
+        CreateMap<ElectionCandidateResultDto, ElectionCandidateResultViewModel>();
     }
 
-    private static DateTime ToUtc(DateTime localDateTime)
+    private static DateTime ToUtc(DateTime localDate)
     {
         var local = DateTime.SpecifyKind(
-            localDateTime,
+            localDate.Date,
             DateTimeKind.Local);
 
         return local.ToUniversalTime();

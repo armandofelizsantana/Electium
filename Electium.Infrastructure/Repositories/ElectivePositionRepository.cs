@@ -12,6 +12,24 @@ namespace Electium.Infrastructure.Repositories;
 public class ElectivePositionRepository
     : GenericRepository<ElectivePosition>, IElectivePositionRepository
 {
+
+    public async Task DeactivateCandidatesForPositionAsync(
+    int electivePositionId,
+    CancellationToken cancellationToken = default)
+    {
+        var candidates = await _context.CandidateNominations
+            .Where(nomination =>
+                nomination.ElectivePositionId == electivePositionId)
+            .Select(nomination => nomination.Candidate)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+
+        foreach (var candidate in candidates)
+        {
+            candidate.IsActive = false;
+        }
+    }
+
     private readonly ElectiumDbContext _context;
 
     public ElectivePositionRepository(ElectiumDbContext context)

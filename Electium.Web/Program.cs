@@ -8,8 +8,7 @@ using Electium.Web.Mapping;
 using Electium.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Electium.Web.Data;
-
-
+using Electium.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,14 +33,27 @@ builder.Services.AddAutoMapper(
     cfg => { },
     typeof(CitizenMappingProfile).Assembly);
 
+builder.Services.AddScoped<
+    IIdentityDocumentOcrService,
+    TesseractIdentityDocumentOcrService>();
+
 builder.Services.AddScoped(
     typeof(IGenericService<,,,>),
     typeof(GenericService<,,,>));
 
+builder.Services.AddScoped<
+    IVoterEligibilityRepository,
+    VoterEligibilityRepository>();
+
+builder.Services.AddScoped<
+    IVoterEligibilityService,
+    VoterEligibilityService>();
+
 builder.Services.AddAutoMapper(
     cfg => { },
     typeof(CitizenMappingProfile),
-    typeof(CitizenWebMappingProfile));
+    typeof(CitizenWebMappingProfile),
+    typeof(ElectionWebMappingProfile));
 
 builder.Services.AddScoped<ICitizenRepository, CitizenRepository>();
 builder.Services.AddScoped<ICitizenService, CitizenService>();
@@ -74,7 +86,14 @@ builder.Services.AddScoped<
     IAuthenticationService,
     IdentityAuthenticationService>();
 
+builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -90,7 +109,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

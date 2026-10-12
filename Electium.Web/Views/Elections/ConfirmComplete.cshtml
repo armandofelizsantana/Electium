@@ -1,0 +1,27 @@
+﻿@using Electium.Application.DTOs
+@model ElectionDto
+
+@{
+    ViewData["Title"] = "Confirmar finalización";
+}
+
+<h1>Finalizar elección</h1>
+
+<div class="alert alert-warning" role="alert">
+    ¿Confirmas que deseas finalizar la elección
+    <strong>@Model.Name</strong>?
+    Esta acción cambiará su estado a finalizada.
+</div>
+
+<form asp-action="Complete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    @Html.AntiForgeryToken()
+
+    <button type="submit" class="btn btn-danger">
+        Sí, finalizar elección
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>

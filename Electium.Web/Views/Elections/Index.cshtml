@@ -1,0 +1,108 @@
+﻿@using Electium.Domain.Enums
+@model IEnumerable<Electium.Web.ViewModels.ElectionListViewModel>
+
+@{
+    ViewData["Title"] = "Elecciones";
+    var hasActiveElection = Model.Any(
+        election => election.IsActive &&
+                    election.Status == ElectionStatus.Active);
+}
+
+<h1>Elecciones</h1>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (!hasActiveElection)
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            Crear elección
+        </a>
+    </p>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        Ya existe una elección en proceso. No se puede crear otra hasta
+        finalizarla.
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <p>No hay elecciones registradas.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Elección</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Partidos</th>
+                    <th>Puestos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var election in Model)
+                {
+                    <tr>
+                        <td>@election.Name</td>
+                        <td>@election.ElectionDateLocal.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (election.Status == ElectionStatus.Active)
+                            {
+                                <span class="badge bg-success">En proceso</span>
+                            }
+                            else if (election.Status == ElectionStatus.Completed)
+                            {
+                                <span class="badge bg-secondary">Finalizada</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    En configuración
+                                </span>
+                            }
+                        </td>
+                        <td>@election.PoliticalPartyCount</td>
+                        <td>@election.ElectivePositionCount</td>
+                        <td>
+                            @if (election.Status == ElectionStatus.Active)
+                            {
+                                <a asp-action="ConfirmComplete"
+                                   asp-route-id="@election.Id"
+                                   class="btn btn-sm btn-warning">
+                                    Finalizar
+                                </a>
+                            }
+                            else if (election.Status == ElectionStatus.Completed)
+                            {
+                                <a asp-action="Results"
+                                   asp-route-id="@election.Id"
+                                   class="btn btn-sm btn-primary">
+                                    Ver resultados
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

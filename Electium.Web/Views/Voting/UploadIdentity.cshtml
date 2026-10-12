@@ -1,0 +1,42 @@
+﻿@model Electium.Web.ViewModels.UploadIdentityViewModel
+
+@{
+    ViewData["Title"] = "Verificar identidad";
+}
+
+<h1>Verificar identidad</h1>
+
+<p>
+    Sube una imagen clara de la parte frontal de tu cédula.
+    La aplicación verificará el número mediante OCR.
+</p>
+
+<form asp-action="UploadIdentity"
+      method="post"
+      enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FrontImage" class="form-label">
+            Imagen frontal de la cédula
+        </label>
+
+        <input asp-for="FrontImage"
+               type="file"
+               accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+               class="form-control" />
+
+        <span asp-validation-for="FrontImage" class="text-danger"></span>
+        <div class="form-text">Formatos JPG o PNG, máximo 5 MB.</div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Verificar identidad
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

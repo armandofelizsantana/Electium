@@ -48,13 +48,23 @@ public class ElectivePositionService
     }
 
     public override async Task<bool> SetActiveAsync(
-        int id,
-        bool isActive,
-        CancellationToken cancellationToken = default)
+    int id,
+    bool isActive,
+    CancellationToken cancellationToken = default)
     {
         await EnsureThereIsNoActiveElectionAsync(cancellationToken);
 
-        return await base.SetActiveAsync(id, isActive, cancellationToken);
+        if (!isActive)
+        {
+            await _repository.DeactivateCandidatesForPositionAsync(
+                id,
+                cancellationToken);
+        }
+
+        return await base.SetActiveAsync(
+            id,
+            isActive,
+            cancellationToken);
     }
 
     private async Task EnsureThereIsNoActiveElectionAsync(

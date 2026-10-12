@@ -1,0 +1,74 @@
+﻿@model Electium.Web.ViewModels.ElectionResultsViewModel
+
+@{
+    ViewData["Title"] = "Resultados";
+}
+
+<h1>Resultados: @Model.ElectionName</h1>
+
+@if (!Model.Positions.Any())
+{
+    <div class="alert alert-info" role="alert">
+        Esta elección no tiene puestos ni resultados registrados.
+    </div>
+}
+else
+{
+    @foreach (var position in Model.Positions)
+    {
+        <section class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">@position.PositionName</h2>
+            </div>
+
+            <div class="card-body">
+                <p>
+                    Total de votos registrados para este puesto:
+                    <strong>@position.TotalVotes</strong>
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Candidato</th>
+                                <th>Partido</th>
+                                <th>Votos</th>
+                                <th>Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var candidate in position.Candidates)
+                            {
+                                <tr>
+                                    <td>
+                                        @candidate.CandidateFirstName
+                                        @candidate.CandidateLastName
+                                    </td>
+                                    <td>
+                                        @candidate.PartyName
+                                        (@candidate.PartyAcronym)
+                                    </td>
+                                    <td>@candidate.Votes</td>
+                                    <td>@candidate.Percentage.ToString("0.##")%</td>
+                                </tr>
+                            }
+
+                            <tr class="table-light">
+                                <td colspan="2"><strong>Ninguno</strong></td>
+                                <td>@position.NoneVotes</td>
+                                <td>
+                                    @position.NonePercentage.ToString("0.##")%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    }
+}
+
+<a asp-action="Index" class="btn btn-secondary">
+    Volver a elecciones
+</a>

@@ -1,0 +1,39 @@
+﻿@model Electium.Web.ViewModels.VoterStartViewModel
+
+@{
+    ViewData["Title"] = "Participar en la elección";
+}
+
+<h1>Participar en la elección</h1>
+
+<p>Ingresa tu número de documento para comprobar si puedes votar.</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert @(Model.IsError ? "alert-danger" : "alert-success")"
+         role="alert">
+        @Model.Message
+    </div>
+}
+
+<form asp-action="CheckEligibility" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="IdentityNumber" class="form-label">
+            Número de documento
+        </label>
+        <input asp-for="IdentityNumber" class="form-control" autocomplete="off" />
+        <span asp-validation-for="IdentityNumber" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Continuar
+    </button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

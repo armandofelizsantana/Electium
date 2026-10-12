@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Electium.Application.DTOs;
+﻿using Electium.Application.DTOs;
 using Electium.Domain.Entities;
 
 namespace Electium.Application.Interfaces;
@@ -13,11 +10,14 @@ public interface IElectionService
         CreateElectionDto,
         UpdateElectionDto>
 {
-    Task<bool> ActivateAsync(
-        int id,
-        CancellationToken cancellationToken = default);
-
     Task<bool> CompleteAsync(
         int id,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ElectionSummaryDto>> GetSummariesAsync(
+    CancellationToken cancellationToken = default);
+
+    Task<ElectionResultsDto?> GetResultsAsync(
+    int electionId,
+    CancellationToken cancellationToken = default);
 }

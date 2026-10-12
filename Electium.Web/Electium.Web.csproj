@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="tessdata\spa.traineddata" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tessdata\spa.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Electium.Application\Electium.Application.csproj" />
     <ProjectReference Include="..\Electium.Infrastructure\Electium.Infrastructure.csproj" />
     <ProjectReference Include="..\Electium.Shared\Electium.Shared.csproj" />

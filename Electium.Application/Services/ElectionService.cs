@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Electium.Application.DTOs;
 using Electium.Application.Exceptions;
 using Electium.Application.Interfaces;
@@ -20,6 +17,21 @@ public class ElectionService
 {
     private readonly IElectionRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+
+    public Task<ElectionResultsDto?> GetResultsAsync(
+    int electionId,
+    CancellationToken cancellationToken = default)
+    {
+        return _repository.GetResultsAsync(electionId, cancellationToken);
+    }
+
+    public Task<IReadOnlyList<ElectionSummaryDto>> GetSummariesAsync(
+    CancellationToken cancellationToken = default)
+    {
+        return _repository.GetElectionSummariesAsync(cancellationToken);
+    }
 
     public ElectionService(
         IElectionRepository repository,
@@ -29,15 +41,74 @@ public class ElectionService
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     public override async Task<ElectionDto> CreateAsync(
         CreateElectionDto dto,
         CancellationToken cancellationToken = default)
     {
-        ValidateDates(dto.StartsAtUtc, dto.EndsAtUtc);
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            throw new BusinessRuleException(
+                "El nombre de la elección es obligatorio.");
+        }
 
-        return await base.CreateAsync(dto, cancellationToken);
+        if (dto.StartsAtUtc == default)
+        {
+            throw new BusinessRuleException(
+                "La fecha de realización de la elección es obligatoria.");
+        }
+
+        var readiness = await _repository.GetCreationReadinessAsync(
+            cancellationToken);
+
+        if (readiness.HasActiveElection)
+        {
+            throw new BusinessRuleException(
+                "Ya existe una elección activa. No se puede iniciar otra.");
+        }
+
+        if (readiness.ActiveElectivePositionCount == 0)
+        {
+            throw new BusinessRuleException(
+                "No hay puestos electivos activos para realizar una elección.");
+        }
+
+        if (readiness.ActivePoliticalPartyCount < 2)
+        {
+            throw new BusinessRuleException(
+                "No hay suficientes partidos políticos para realizar una elección.");
+        }
+
+        if (readiness.PartiesMissingPositions.Count > 0)
+        {
+            var messages = readiness.PartiesMissingPositions.Select(party =>
+                $"El partido político {party.PoliticalPartyName} " +
+                $"{party.PoliticalPartyAcronym} no tiene candidatos registrados " +
+                "para los siguientes puestos electivos: " +
+                $"{string.Join(", ", party.MissingPositionNames)}.");
+
+            throw new BusinessRuleException(
+                string.Join(Environment.NewLine, messages));
+        }
+
+        dto.Name = dto.Name.Trim();
+
+        var election = _mapper.Map<Election>(dto);
+        election.Status = ElectionStatus.Active;
+        election.IsActive = true;
+        election.Year = dto.Year;
+
+        await _repository.AddAsync(election, cancellationToken);
+
+        await _repository.AddCandidateSnapshotsAsync(
+            election,
+            cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<ElectionDto>(election);
     }
 
     public override async Task<ElectionDto?> UpdateAsync(
@@ -45,7 +116,9 @@ public class ElectionService
         UpdateElectionDto dto,
         CancellationToken cancellationToken = default)
     {
-        var election = await _repository.GetByIdAsync(id, cancellationToken);
+        var election = await _repository.GetByIdAsync(
+            id,
+            cancellationToken);
 
         if (election is null)
         {
@@ -55,82 +128,43 @@ public class ElectionService
         if (election.Status != ElectionStatus.Configuring)
         {
             throw new BusinessRuleException(
-                "Solo se pueden editar elecciones que estén en configuración.");
+                "No se puede editar una elección que ya está en proceso o finalizada.");
         }
 
-        ValidateDates(dto.StartsAtUtc, dto.EndsAtUtc);
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            throw new BusinessRuleException(
+                "El nombre de la elección es obligatorio.");
+        }
+
+        if (dto.StartsAtUtc == default)
+        {
+            throw new BusinessRuleException(
+                "La fecha de realización de la elección es obligatoria.");
+        }
+
+        dto.Name = dto.Name.Trim();
+        dto.Year = dto.StartsAtUtc.ToLocalTime().Year;
 
         return await base.UpdateAsync(id, dto, cancellationToken);
     }
 
-    public override async Task<bool> SetActiveAsync(
+    public override Task<bool> SetActiveAsync(
         int id,
         bool isActive,
         CancellationToken cancellationToken = default)
     {
-        var election = await _repository.GetByIdAsync(id, cancellationToken);
-
-        if (election is null)
-        {
-            return false;
-        }
-
-        if (election.Status != ElectionStatus.Configuring)
-        {
-            throw new BusinessRuleException(
-                "Solo se puede activar o desactivar una elección que esté en configuración.");
-        }
-
-        election.IsActive = isActive;
-        _repository.Update(election);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
-    }
-
-    public async Task<bool> ActivateAsync(
-        int id,
-        CancellationToken cancellationToken = default)
-    {
-        var election = await _repository.GetByIdAsync(id, cancellationToken);
-
-        if (election is null)
-        {
-            return false;
-        }
-
-        if (!election.IsActive)
-        {
-            throw new BusinessRuleException(
-                "No se puede iniciar una elección desactivada.");
-        }
-
-        if (election.Status != ElectionStatus.Configuring)
-        {
-            throw new BusinessRuleException(
-                "Solo se puede iniciar una elección que esté en configuración.");
-        }
-
-        if (await _repository.HasActiveElectionAsync(cancellationToken))
-        {
-            throw new BusinessRuleException(
-                "Ya existe otra elección activa. Complétala antes de iniciar una nueva.");
-        }
-
-        election.Status = ElectionStatus.Active;
-        _repository.Update(election);
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return true;
+        throw new BusinessRuleException(
+            "El estado de una elección se controla mediante su creación y finalización.");
     }
 
     public async Task<bool> CompleteAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
-        var election = await _repository.GetByIdAsync(id, cancellationToken);
+        var election = await _repository.GetByIdAsync(
+            id,
+            cancellationToken);
 
         if (election is null)
         {
@@ -140,31 +174,19 @@ public class ElectionService
         if (election.Status != ElectionStatus.Active)
         {
             throw new BusinessRuleException(
-                "Solo se puede completar una elección que esté activa.");
+                "Solo se puede finalizar una elección que esté en proceso.");
         }
 
         election.Status = ElectionStatus.Completed;
-        _repository.Update(election);
+        election.EndsAtUtc = DateTime.UtcNow;
 
+        _repository.Update(election);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
-    }
 
-    private static void ValidateDates(
-        DateTime startsAtUtc,
-        DateTime? endsAtUtc)
-    {
-        if (startsAtUtc == default)
-        {
-            throw new BusinessRuleException(
-                "La fecha de inicio de la elección es obligatoria.");
-        }
 
-        if (endsAtUtc.HasValue && endsAtUtc.Value <= startsAtUtc)
-        {
-            throw new BusinessRuleException(
-                "La fecha de finalización debe ser posterior a la fecha de inicio.");
-        }
+
+
     }
 }

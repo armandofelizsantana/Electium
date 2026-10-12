@@ -1,0 +1,34 @@
+﻿@model Electium.Web.ViewModels.ConfirmElectivePositionStatusViewModel
+
+@{
+    ViewData["Title"] = "Confirmar cambio de estado";
+}
+
+<h1>Confirmar cambio de estado</h1>
+
+<div class="alert alert-warning" role="alert">
+    ¿Confirmas que deseas @Model.ActionText el puesto
+    <strong>@Model.Name</strong>?
+
+    @if (!Model.IsActive)
+    {
+        <div class="mt-2">
+            Al desactivarlo, también se desactivarán sus candidatos nominados.
+        </div>
+    }
+</div>
+
+<form asp-action="SetActive" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="isActive" value="@Model.IsActive.ToString().ToLowerInvariant()" />
+
+    <button type="submit" class="btn btn-primary">
+        @Model.ButtonText
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Cancelar
+    </a>
+</form>

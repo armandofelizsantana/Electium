@@ -6,17 +6,11 @@ public class CreateElectionViewModel
 {
     [Required(ErrorMessage = "El nombre de la elección es obligatorio.")]
     [StringLength(150)]
+    [Display(Name = "Nombre de la elección")]
     public string Name { get; set; } = string.Empty;
 
-    [Range(1900, 9999, ErrorMessage = "Ingresa un año válido.")]
-    public int Year { get; set; }
-
-    [Required(ErrorMessage = "La fecha y hora de inicio son obligatorias.")]
-    [DataType(DataType.DateTime)]
-    [Display(Name = "Inicio (hora local)")]
-    public DateTime? StartsAtLocal { get; set; }
-
-    [DataType(DataType.DateTime)]
-    [Display(Name = "Finalización (hora local)")]
-    public DateTime? EndsAtLocal { get; set; }
+    [Required(ErrorMessage = "La fecha de realización es obligatoria.")]
+    [DataType(DataType.Date)]
+    [Display(Name = "Fecha de realización")]
+    public DateTime? ElectionDateLocal { get; set; }
 }

@@ -86,6 +86,33 @@ public class ElectivePositionsController : Controller
         return View(viewModel);
     }
 
+
+    [HttpGet]
+    public async Task<IActionResult> ConfirmSetActive(
+    int id,
+    bool isActive,
+    CancellationToken cancellationToken)
+    {
+        var position = await _electivePositionService.GetByIdAsync(
+            id,
+            cancellationToken);
+
+        if (position is null)
+        {
+            return NotFound();
+        }
+
+        var viewModel = new ConfirmElectivePositionStatusViewModel
+        {
+            Id = position.Id,
+            Name = position.Name,
+            IsActive = isActive
+        };
+
+        return View(viewModel);
+    }
+
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(

@@ -10,4 +10,8 @@ public interface IElectivePositionRepository
 {
     Task<bool> HasActiveElectionAsync(
         CancellationToken cancellationToken = default);
+
+    Task DeactivateCandidatesForPositionAsync(
+    int electivePositionId,
+    CancellationToken cancellationToken = default);
 }
