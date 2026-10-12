@@ -1,0 +1,97 @@
+﻿@model Electium.Web.ViewModels.CandidateIndexViewModel
+
+@{
+    ViewData["Title"] = "Candidatos";
+}
+
+<h1>Candidatos de mi partido</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success" id="candidateSuccess">@success</div>
+}
+
+@if (Model.HasActiveElection)
+{
+    <div class="alert alert-warning">
+        Hay una elección activa. No puedes crear, editar ni cambiar el estado
+        de los candidatos.
+    </div>
+}
+else
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Crear candidato</a>
+    </p>
+}
+
+@if (Model.Candidates.Count == 0)
+{
+    <p>Tu partido aún no tiene candidatos registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nombre</th>
+                    <th>Puesto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var candidate in Model.Candidates)
+            {
+                <tr>
+                    <td>
+                        <img src="@candidate.PhotoPath"
+                             alt="Foto de @candidate.FirstName @candidate.LastName"
+                             style="width:70px;height:70px;object-fit:cover" />
+                    </td>
+                    <td>@candidate.FirstName @candidate.LastName</td>
+                    <td>@(candidate.ElectivePositionName ?? "Sin puesto asociado")</td>
+                    <td>@(candidate.IsActive ? "Activo" : "Inactivo")</td>
+                    <td>
+                        @if (!Model.HasActiveElection)
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@candidate.Id"
+                               class="btn btn-sm btn-warning">
+                                Editar
+                            </a>
+
+                            <a asp-action="ConfirmSetActive"
+                               asp-route-id="@candidate.Id"
+                               asp-route-isActive="@(!candidate.IsActive)"
+                               class="btn btn-sm @(candidate.IsActive ? "btn-secondary" : "btn-success")">
+                                @(candidate.IsActive ? "Desactivar" : "Activar")
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const message = document.getElementById("candidateSuccess");
+            if (message) {
+                message.style.transition = "opacity 500ms";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 3000);
+    </script>
+}

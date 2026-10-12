@@ -1,0 +1,54 @@
+﻿@model Electium.Web.ViewModels.EditCandidateViewModel
+
+@{
+    ViewData["Title"] = "Editar candidato";
+}
+
+<h1>Editar candidato</h1>
+
+<form asp-action="Edit"
+      asp-route-id="@Model.Id"
+      method="post"
+      enctype="multipart/form-data">
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="CurrentPhotoPath" type="hidden" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label">Nombre</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Apellido</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <p>Foto actual:</p>
+        <img src="@Model.CurrentPhotoPath"
+             alt="Foto actual del candidato"
+             style="width:100px;height:100px;object-fit:cover" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PhotoFile" class="form-label">
+            Foto nueva (opcional)
+        </label>
+        <input asp-for="PhotoFile"
+               type="file"
+               accept=".png,.jpg,.jpeg,.webp"
+               class="form-control" />
+        <span asp-validation-for="PhotoFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

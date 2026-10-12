@@ -30,7 +30,23 @@ builder.Services.AddScoped(
 
 builder.Services.AddScoped<
     IPoliticalLeaderService,
-    PoliticalLeaderService>(); 
+    PoliticalLeaderService>();
+
+builder.Services.AddScoped<
+    ILeaderCandidateRepository,
+    LeaderCandidateRepository>();
+
+builder.Services.AddScoped<
+    ILeaderCandidateService,
+    LeaderCandidateService>();
+
+builder.Services.AddScoped<
+    ILeaderNominationRepository,
+    LeaderNominationRepository>();
+
+builder.Services.AddScoped<
+    ILeaderNominationService,
+    LeaderNominationService>();
 //Debajo
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -40,7 +56,8 @@ builder.Services.AddAutoMapper(
     typeof(CitizenMappingProfile),
     typeof(CitizenWebMappingProfile),
     typeof(ElectionWebMappingProfile),
-    typeof(PoliticalPartyWebMappingProfile));
+    typeof(PoliticalPartyWebMappingProfile),
+    typeof(CandidateWebMappingProfile));
 
 builder.Services.AddScoped<
     IIdentityDocumentOcrService,

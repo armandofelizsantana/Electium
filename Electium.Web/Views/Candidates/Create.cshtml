@@ -1,0 +1,39 @@
+﻿@model Electium.Web.ViewModels.CreateCandidateViewModel
+
+@{
+    ViewData["Title"] = "Crear candidato";
+}
+
+<h1>Crear candidato</h1>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label">Nombre</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Apellido</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PhotoFile" class="form-label">Foto obligatoria</label>
+        <input asp-for="PhotoFile"
+               type="file"
+               accept=".png,.jpg,.jpeg,.webp"
+               class="form-control" />
+        <span asp-validation-for="PhotoFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,31 @@
+﻿@model Electium.Web.ViewModels.ConfirmCandidateStatusViewModel
+
+@{
+    ViewData["Title"] = Model.IsActive
+        ? "Confirmar activación"
+        : "Confirmar desactivación";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    ¿Está seguro que desea
+    @(Model.IsActive ? "activar" : "desactivar")
+    al candidato <strong>@Model.FullName</strong>?
+</p>
+
+<form asp-action="SetActive" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden"
+           name="isActive"
+           value="@(Model.IsActive ? "true" : "false")" />
+
+    <button type="submit"
+            class="btn @(Model.IsActive ? "btn-success" : "btn-danger")">
+        Aceptar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

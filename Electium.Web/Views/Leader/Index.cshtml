@@ -5,6 +5,12 @@
 <h1>Inicio del dirigente politico</h1>
 <p>La sesion del dirigente esta activa.</p>
 
+<a asp-controller="Candidates"
+   asp-action="Index"
+   class="btn btn-primary">
+    Candidatos
+</a>
+
 <form asp-controller="Account" asp-action="Logout" method="post">
     <button type="submit" class="btn btn-outline-secondary">
         Cerrar sesion
