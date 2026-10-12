@@ -1,0 +1,84 @@
+﻿@model IEnumerable<Electium.Web.ViewModels.PoliticalPartyListViewModel>
+
+@{
+    ViewData["Title"] = "Partidos políticos";
+}
+
+<h1>Partidos políticos</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success" id="partySuccess">@success</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear partido</a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>No hay partidos registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Nombre</th>
+                    <th>Sigla</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var party in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@party.LogoPath"
+                             alt="Logo de @party.Name"
+                             style="max-width:70px; max-height:50px" />
+                    </td>
+                    <td>@party.Name</td>
+                    <td>@party.Acronym</td>
+                    <td>@party.Description</td>
+                    <td>@(party.IsActive ? "Activo" : "Inactivo")</td>
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@party.Id"
+                           class="btn btn-sm btn-warning">Editar</a>
+
+                        <a asp-action="ConfirmSetActive"
+                           asp-route-id="@party.Id"
+                           asp-route-isActive="@(!party.IsActive)"
+                           class="btn btn-sm @(party.IsActive ? "btn-secondary" : "btn-success")">
+                            @(party.IsActive ? "Desactivar" : "Activar")
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const message = document.getElementById("partySuccess");
+            if (message) {
+                message.style.transition = "opacity 500ms";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 3000);
+    </script>
+}

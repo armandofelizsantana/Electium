@@ -1,18 +1,32 @@
 ﻿@{
-    ViewData["Title"] = "Inicio del administrador";
+    ViewData["Title"] = "Bienvenido, eres administrador!";
 }
 
-<h1>Inicio del administrador</h1>
-<p>La sesión de administrador esta activa.</p>
+<h1>Bienvenido, eres administrador!</h1>
+<p>La sesión de administrador está activa.</p>
 
-<a asp-controller="ElectivePositions"
-   asp-action="Index"
-   class="btn btn-primary">
-    Administrar puestos electivos
-</a>
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-controller="ElectivePositions"
+       asp-action="Index"
+       class="btn btn-primary">
+        Administrar puestos electivos
+    </a>
+
+    <a asp-controller="PoliticalParties"
+       asp-action="Index"
+       class="btn btn-primary">
+        Administrar partidos políticos
+    </a>
+
+    <a asp-controller="PoliticalLeaders"
+       asp-action="Index"
+       class="btn btn-primary">
+        Administrar dirigentes políticos
+    </a>
+</div>
 
 <form asp-controller="Account" asp-action="Logout" method="post">
     <button type="submit" class="btn btn-outline-secondary">
-        Cerrar sesion
+        Cerrar sesión
     </button>
 </form>

@@ -1,0 +1,32 @@
+﻿@model Electium.Web.ViewModels.ConfirmPoliticalPartyStatusViewModel
+
+@{
+    ViewData["Title"] = Model.IsActive
+        ? "Confirmar activación"
+        : "Confirmar desactivación";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    ¿Confirmas que deseas @(Model.IsActive ? "activar" : "desactivar")
+    el partido <strong>@Model.Name</strong>?
+</p>
+
+@if (!Model.IsActive)
+{
+    <div class="alert alert-warning">
+        También se desactivarán los candidatos y postulaciones relacionados.
+    </div>
+}
+
+<form asp-action="SetActive" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden" name="isActive" value="@Model.IsActive.ToString().ToLowerInvariant()" />
+
+    <button type="submit"
+            class="btn @(Model.IsActive ? "btn-success" : "btn-danger")">
+        Confirmar
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,45 @@
+﻿@model Electium.Web.ViewModels.CreatePoliticalPartyViewModel
+
+@{
+    ViewData["Title"] = "Crear partido";
+}
+
+<h1>Crear partido</h1>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Nombre</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Acronym" class="form-label">Sigla</label>
+        <input asp-for="Acronym" class="form-control" />
+        <span asp-validation-for="Acronym" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Descripción</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LogoFile" class="form-label">Logo obligatorio</label>
+        <input asp-for="LogoFile"
+               type="file"
+               accept=".png,.jpg,.jpeg,.webp"
+               class="form-control" />
+        <span asp-validation-for="LogoFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

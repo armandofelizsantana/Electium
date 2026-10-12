@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Electium.Web.ViewModels.PoliticalLeaderListViewModel>
+
+@{
+    ViewData["Title"] = "Dirigentes políticos";
+}
+
+<h1>Dirigentes políticos</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success" id="leaderSuccess">@success</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear dirigente</a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>No hay dirigentes registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Partido</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var leader in Model)
+            {
+                <tr>
+                    <td>@leader.FirstName @leader.LastName</td>
+                    <td>@leader.UserName</td>
+                    <td>@leader.Email</td>
+                    <td>@(leader.PoliticalPartyName ?? "Sin partido")</td>
+                    <td>@(leader.IsActive ? "Activo" : "Inactivo")</td>
+                    <td>
+                        <form asp-action="SetActive"
+                              method="post"
+                              onsubmit="return confirm('¿Confirmas este cambio de estado?');">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@leader.Id" />
+
+                            <button type="submit"
+                                    name="isActive"
+                                    value="@(leader.IsActive ? "false" : "true")"
+                                    class="btn btn-sm @(leader.IsActive ? "btn-secondary" : "btn-success")">
+                                @(leader.IsActive ? "Desactivar" : "Activar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const message = document.getElementById("leaderSuccess");
+
+            if (message) {
+                message.style.transition = "opacity 500ms";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 3000);
+    </script>
+}

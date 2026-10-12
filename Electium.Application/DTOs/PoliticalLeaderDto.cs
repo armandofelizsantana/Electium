@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Electium.Application.DTOs;
+
+public class PoliticalLeaderDto
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public int? PoliticalPartyId { get; set; }
+    public string? PoliticalPartyName { get; set; }
+    public bool IsActive { get; set; }
+}

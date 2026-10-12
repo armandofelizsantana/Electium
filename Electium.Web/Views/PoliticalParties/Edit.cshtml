@@ -1,0 +1,55 @@
+﻿@model Electium.Web.ViewModels.EditPoliticalPartyViewModel
+
+@{
+    ViewData["Title"] = "Editar partido";
+}
+
+<h1>Editar partido</h1>
+
+<form asp-action="Edit" asp-route-id="@Model.Id"
+      method="post" enctype="multipart/form-data">
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="CurrentLogoPath" type="hidden" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Acronym" class="form-label">Sigla</label>
+        <input asp-for="Acronym" class="form-control" />
+        <span asp-validation-for="Acronym" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Descripción</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <p>Logo actual:</p>
+        <img src="@Model.CurrentLogoPath"
+             alt="Logo actual"
+             style="max-width:120px; max-height:90px" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LogoFile" class="form-label">
+            Selecciona otro logo solo si deseas reemplazarlo
+        </label>
+        <input asp-for="LogoFile" type="file" accept=".png,.jpg,.jpeg,.webp" class="form-control" />
+        <span asp-validation-for="LogoFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

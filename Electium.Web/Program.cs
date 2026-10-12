@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Electium.Web.Data;
 using Electium.Infrastructure.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -27,11 +28,19 @@ builder.Services.AddScoped(
     typeof(IGenericRepository<>),
     typeof(GenericRepository<>));
 
+builder.Services.AddScoped<
+    IPoliticalLeaderService,
+    PoliticalLeaderService>(); 
+//Debajo
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAutoMapper(
     cfg => { },
-    typeof(CitizenMappingProfile).Assembly);
+    typeof(CitizenMappingProfile),
+    typeof(CitizenWebMappingProfile),
+    typeof(ElectionWebMappingProfile),
+    typeof(PoliticalPartyWebMappingProfile));
 
 builder.Services.AddScoped<
     IIdentityDocumentOcrService,
@@ -40,6 +49,10 @@ builder.Services.AddScoped<
 builder.Services.AddScoped(
     typeof(IGenericService<,,,>),
     typeof(GenericService<,,,>));
+
+builder.Services.AddScoped<
+    IPoliticalPartyService,
+    PoliticalPartyService>();
 
 builder.Services.AddScoped<
     IVoterEligibilityRepository,
@@ -85,6 +98,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<
     IAuthenticationService,
     IdentityAuthenticationService>();
+
+builder.Services.AddScoped<
+    IPoliticalPartyRepository,
+    PoliticalPartyRepository>();
 
 builder.Services.AddDistributedMemoryCache();
 
