@@ -1,0 +1,49 @@
+﻿@model Electium.Web.ViewModels.CreateElectionViewModel
+
+@{
+    ViewData["Title"] = "Crear elección";
+}
+
+<h1>Iniciar nuevo proceso electoral</h1>
+
+<p>
+    Al crearla, la elección comenzará directamente en estado
+    <strong>En proceso</strong>, siempre que se cumplan los requisitos.
+</p>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly"
+         class="alert alert-danger"
+         role="alert"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name"
+               class="form-control"
+               maxlength="150" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ElectionDateLocal" class="form-label"></label>
+        <input asp-for="ElectionDateLocal"
+               type="date"
+               class="form-control" />
+        <span asp-validation-for="ElectionDateLocal"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Iniciar elección
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Volver a elecciones
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

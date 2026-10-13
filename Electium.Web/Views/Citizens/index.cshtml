@@ -1,0 +1,85 @@
+﻿@model IEnumerable<Electium.Web.ViewModels.CitizenListViewModel>
+
+@{
+    ViewData["Title"] = "Ciudadanos";
+}
+
+<h1>Ciudadanos</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success" id="citizenSuccess" role="alert">
+        @success
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear ciudadano</a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>No hay ciudadanos registrados.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Email</th>
+                    <th>Documento de identidad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var citizen in Model)
+                {
+                    <tr>
+                        <td>@citizen.FirstName</td>
+                        <td>@citizen.LastName</td>
+                        <td>@citizen.Email</td>
+                        <td>@citizen.IdentityNumber</td>
+                        <td>@(citizen.IsActive ? "Activo" : "Inactivo")</td>
+                        <td>
+                            <a asp-action="Edit"
+                               asp-route-id="@citizen.Id"
+                               class="btn btn-sm btn-warning">
+                                Editar
+                            </a>
+
+                            <a asp-action="ConfirmSetActive"
+                               asp-route-id="@citizen.Id"
+                               asp-route-isActive="@(!citizen.IsActive)"
+                               class="btn btn-sm @(citizen.IsActive ? "btn-secondary" : "btn-success")">
+                                @(citizen.IsActive ? "Desactivar" : "Activar")
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            const message = document.getElementById("citizenSuccess");
+
+            if (message) {
+                message.style.transition = "opacity 500ms";
+                message.style.opacity = "0";
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 3000);
+    </script>
+}

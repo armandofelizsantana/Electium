@@ -38,34 +38,61 @@ public class CandidatesController : Controller
             return Forbid();
         }
 
-        var candidates = await _candidateService.GetAllForLeaderAsync(
-            leaderId,
-            cancellationToken);
-
-        var viewModel = new CandidateIndexViewModel
+        try
         {
-            Candidates =
-                _mapper.Map<List<CandidateListItemViewModel>>(candidates),
-            HasActiveElection =
-                await _candidateService.HasActiveElectionAsync(
-                    cancellationToken)
-        };
+            var candidates = await _candidateService.GetAllForLeaderAsync(
+                leaderId,
+                cancellationToken);
 
-        return View(viewModel);
+            var viewModel = new CandidateIndexViewModel
+            {
+                Candidates =
+                    _mapper.Map<List<CandidateListItemViewModel>>(candidates),
+
+                HasActiveElection =
+                    await _candidateService.HasActiveElectionAsync(
+                        cancellationToken)
+            };
+
+            return View(viewModel);
+        }
+        catch (BusinessRuleException exception)
+        {
+            return RedirectToLeaderHomeWithError(exception);
+        }
     }
 
     [HttpGet]
     public async Task<IActionResult> Create(
         CancellationToken cancellationToken)
     {
-        if (await _candidateService.HasActiveElectionAsync(cancellationToken))
+        if (!TryGetLeaderId(out var leaderId))
         {
-            TempData["Error"] =
-                "No se pueden crear candidatos mientras haya una elección activa.";
-            return RedirectToAction(nameof(Index));
+            return Forbid();
         }
 
-        return View(new CreateCandidateViewModel());
+        try
+        {
+            // También comprueba que la cuenta tenga un partido activo.
+            await _candidateService.GetAllForLeaderAsync(
+                leaderId,
+                cancellationToken);
+
+            if (await _candidateService.HasActiveElectionAsync(
+                    cancellationToken))
+            {
+                TempData["Error"] =
+                    "No se pueden crear candidatos mientras haya una elección activa.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(new CreateCandidateViewModel());
+        }
+        catch (BusinessRuleException exception)
+        {
+            return RedirectToLeaderHomeWithError(exception);
+        }
     }
 
     [HttpPost]
@@ -112,7 +139,10 @@ public class CandidatesController : Controller
         catch (ArgumentException exception)
         {
             DeletePhoto(savedPhotoPath);
-            ModelState.AddModelError(nameof(viewModel.PhotoFile), exception.Message);
+            ModelState.AddModelError(
+                nameof(viewModel.PhotoFile),
+                exception.Message);
+
             return View(viewModel);
         }
     }
@@ -127,24 +157,33 @@ public class CandidatesController : Controller
             return Forbid();
         }
 
-        if (await _candidateService.HasActiveElectionAsync(cancellationToken))
+        try
         {
-            TempData["Error"] =
-                "No se pueden editar candidatos mientras haya una elección activa.";
-            return RedirectToAction(nameof(Index));
+            if (await _candidateService.HasActiveElectionAsync(
+                    cancellationToken))
+            {
+                TempData["Error"] =
+                    "No se pueden editar candidatos mientras haya una elección activa.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var candidate = await _candidateService.GetForLeaderAsync(
+                leaderId,
+                id,
+                cancellationToken);
+
+            if (candidate is null)
+            {
+                return NotFound();
+            }
+
+            return View(_mapper.Map<EditCandidateViewModel>(candidate));
         }
-
-        var candidate = await _candidateService.GetForLeaderAsync(
-            leaderId,
-            id,
-            cancellationToken);
-
-        if (candidate is null)
+        catch (BusinessRuleException exception)
         {
-            return NotFound();
+            return RedirectToLeaderHomeWithError(exception);
         }
-
-        return View(_mapper.Map<EditCandidateViewModel>(candidate));
     }
 
     [HttpPost]
@@ -208,7 +247,10 @@ public class CandidatesController : Controller
         catch (ArgumentException exception)
         {
             DeletePhoto(savedPhotoPath);
-            ModelState.AddModelError(nameof(viewModel.PhotoFile), exception.Message);
+            ModelState.AddModelError(
+                nameof(viewModel.PhotoFile),
+                exception.Message);
+
             return View(viewModel);
         }
     }
@@ -224,29 +266,38 @@ public class CandidatesController : Controller
             return Forbid();
         }
 
-        if (await _candidateService.HasActiveElectionAsync(cancellationToken))
+        try
         {
-            TempData["Error"] =
-                "No se pueden cambiar estados durante una elección activa.";
-            return RedirectToAction(nameof(Index));
+            if (await _candidateService.HasActiveElectionAsync(
+                    cancellationToken))
+            {
+                TempData["Error"] =
+                    "No se pueden cambiar estados durante una elección activa.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            var candidate = await _candidateService.GetForLeaderAsync(
+                leaderId,
+                id,
+                cancellationToken);
+
+            if (candidate is null)
+            {
+                return NotFound();
+            }
+
+            return View(new ConfirmCandidateStatusViewModel
+            {
+                Id = candidate.Id,
+                FullName = $"{candidate.FirstName} {candidate.LastName}",
+                IsActive = isActive
+            });
         }
-
-        var candidate = await _candidateService.GetForLeaderAsync(
-            leaderId,
-            id,
-            cancellationToken);
-
-        if (candidate is null)
+        catch (BusinessRuleException exception)
         {
-            return NotFound();
+            return RedirectToLeaderHomeWithError(exception);
         }
-
-        return View(new ConfirmCandidateStatusViewModel
-        {
-            Id = candidate.Id,
-            FullName = $"{candidate.FirstName} {candidate.LastName}",
-            IsActive = isActive
-        });
     }
 
     [HttpPost]
@@ -280,10 +331,17 @@ public class CandidatesController : Controller
         }
         catch (BusinessRuleException exception)
         {
-            TempData["Error"] = exception.Message;
+            return RedirectToLeaderHomeWithError(exception);
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private IActionResult RedirectToLeaderHomeWithError(
+        BusinessRuleException exception)
+    {
+        TempData["Error"] = exception.Message;
+        return RedirectToAction("Index", "Leader");
     }
 
     private bool TryGetLeaderId(out int leaderId)

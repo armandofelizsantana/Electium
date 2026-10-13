@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Electium.Application.Interfaces;
+﻿using Electium.Application.Interfaces;
 using Electium.Domain.Entities;
 using Electium.Domain.Enums;
 using Electium.Infrastructure.Persistence;
@@ -12,24 +9,6 @@ namespace Electium.Infrastructure.Repositories;
 public class ElectivePositionRepository
     : GenericRepository<ElectivePosition>, IElectivePositionRepository
 {
-
-    public async Task DeactivateCandidatesForPositionAsync(
-    int electivePositionId,
-    CancellationToken cancellationToken = default)
-    {
-        var candidates = await _context.CandidateNominations
-            .Where(nomination =>
-                nomination.ElectivePositionId == electivePositionId)
-            .Select(nomination => nomination.Candidate)
-            .Distinct()
-            .ToListAsync(cancellationToken);
-
-        foreach (var candidate in candidates)
-        {
-            candidate.IsActive = false;
-        }
-    }
-
     private readonly ElectiumDbContext _context;
 
     public ElectivePositionRepository(ElectiumDbContext context)
@@ -48,5 +27,26 @@ public class ElectivePositionRepository
                     election.IsActive &&
                     election.Status == ElectionStatus.Active,
                 cancellationToken);
+    }
+
+    public async Task DeactivateCandidatesForPositionAsync(
+        int electivePositionId,
+        CancellationToken cancellationToken = default)
+    {
+        var activeNominations = await _context.CandidateNominations
+            .Where(nomination =>
+                nomination.ElectivePositionId == electivePositionId &&
+                nomination.IsActive)
+            .Include(nomination => nomination.Candidate)
+            .ToListAsync(cancellationToken);
+
+        foreach (var nomination in activeNominations)
+        {
+            // Retira la postulación al puesto.
+            nomination.IsActive = false;
+
+            // Inactiva también al candidato asociado.
+            nomination.Candidate.IsActive = false;
+        }
     }
 }

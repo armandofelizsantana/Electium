@@ -1,0 +1,26 @@
+﻿@model Electium.Web.ViewModels.VoteCompletedViewModel
+
+@{
+    ViewData["Title"] = "Voto registrado";
+}
+
+<h1>Voto registrado</h1>
+
+<div class="alert alert-success" role="alert">
+    Tu voto para la elección <strong>@Model.ElectionName</strong>
+    se registró correctamente.
+</div>
+
+<p>
+    Fecha de registro:
+    <strong>@Model.SubmittedAtLocal.ToString("dd/MM/yyyy HH:mm")</strong>
+</p>
+
+<h2 class="h5">Resumen de tus selecciones</h2>
+
+<ul>
+    @foreach (var selection in Model.SelectionSummary)
+    {
+        <li>@selection</li>
+    }
+</ul>

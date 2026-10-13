@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Electium.Application.DTOs;
 using Electium.Application.Exceptions;
 using Electium.Application.Interfaces;
@@ -18,20 +15,25 @@ public class CitizenService
       ICitizenService
 {
     private readonly ICitizenRepository _citizenRepository;
+    private readonly IElectionRepository _electionRepository;
 
     public CitizenService(
         ICitizenRepository citizenRepository,
+        IElectionRepository electionRepository,
         IUnitOfWork unitOfWork,
         IMapper mapper)
         : base(citizenRepository, unitOfWork, mapper)
     {
         _citizenRepository = citizenRepository;
+        _electionRepository = electionRepository;
     }
 
     public override async Task<CitizenDto> CreateAsync(
         CreateCitizenDto dto,
         CancellationToken cancellationToken = default)
     {
+        await EnsureThereIsNoActiveElectionAsync(cancellationToken);
+
         dto.IdentityNumber = dto.IdentityNumber.Trim();
 
         var alreadyExists =
@@ -53,6 +55,8 @@ public class CitizenService
         UpdateCitizenDto dto,
         CancellationToken cancellationToken = default)
     {
+        await EnsureThereIsNoActiveElectionAsync(cancellationToken);
+
         dto.IdentityNumber = dto.IdentityNumber.Trim();
 
         var citizen = await _citizenRepository.GetByIdAsync(
@@ -62,7 +66,7 @@ public class CitizenService
         if (citizen is null)
         {
             return null;
-        }   
+        }
 
         var alreadyExists =
             await _citizenRepository.IdentityNumberExistsAsync(
@@ -77,5 +81,32 @@ public class CitizenService
         }
 
         return await base.UpdateAsync(id, dto, cancellationToken);
+    }
+
+    public override async Task<bool> SetActiveAsync(
+        int id,
+        bool isActive,
+        CancellationToken cancellationToken = default)
+    {
+        await EnsureThereIsNoActiveElectionAsync(cancellationToken);
+
+        return await base.SetActiveAsync(
+            id,
+            isActive,
+            cancellationToken);
+    }
+
+    private async Task EnsureThereIsNoActiveElectionAsync(
+        CancellationToken cancellationToken)
+    {
+        var hasActiveElection =
+            await _electionRepository.HasActiveElectionAsync(
+                cancellationToken);
+
+        if (hasActiveElection)
+        {
+            throw new BusinessRuleException(
+                "No se pueden crear, editar, activar ni desactivar ciudadanos mientras haya una elección activa.");
+        }
     }
 }

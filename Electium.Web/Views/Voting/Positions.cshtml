@@ -1,0 +1,81 @@
+﻿@model Electium.Web.ViewModels.VoterBallotPositionsViewModel
+
+@{
+    ViewData["Title"] = "Puestos de votación";
+}
+
+<h1>Boleta: @Model.ElectionName</h1>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+<p>
+    Elige una opción para cada puesto. Puedes modificar tus selecciones
+    antes de finalizar la votación.
+</p>
+
+@if (Model.Positions.Count == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        Esta elección no tiene puestos disponibles para votar.
+    </div>
+}
+else
+{
+    <div class="list-group mb-4">
+        @foreach (var position in Model.Positions)
+        {
+            <div class="list-group-item d-flex justify-content-between
+                        align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="h5 mb-1">@position.PositionName</h2>
+                    <div>
+                        Partidos participantes:
+                        <strong>@position.PoliticalPartyCount</strong>
+                        <span class="mx-2">|</span>
+                        Candidatos:
+                        <strong>@position.CandidateCount</strong>
+                    </div>
+
+                    @if (position.IsSelected)
+                    {
+                        <div class="text-success mt-1">
+                            Seleccionaste: @position.SelectedOptionText
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-danger mt-1">
+                            Selección pendiente
+                        </div>
+                    }
+                </div>
+
+                <a asp-action="VotePosition"
+                   asp-route-positionId="@position.ElectivePositionId"
+                   class="btn btn-outline-primary">
+                    @(position.IsSelected ? "Cambiar selección" : "Elegir")
+                </a>
+            </div>
+        }
+    </div>
+
+    <form asp-action="FinalizeVote" method="post">
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-success">
+            Finalizar votación
+        </button>
+    </form>
+}

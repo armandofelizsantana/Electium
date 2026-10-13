@@ -9,9 +9,11 @@ public class CitizenWebMappingProfile : Profile
     public CitizenWebMappingProfile()
     {
         CreateMap<CitizenDto, CitizenListViewModel>();
+        CreateMap<CitizenDto, EditCitizenViewModel>();
 
         CreateMap<CreateCitizenViewModel, CreateCitizenDto>();
-
         CreateMap<EditCitizenViewModel, UpdateCitizenDto>();
     }
 }
+
+

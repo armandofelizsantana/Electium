@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Bienvenido, eres administrador!";
+    ViewData["Title"] = "Bienvenido, eres administrador";
 }
 
-<h1>Bienvenido, eres administrador!</h1>
+<h1>Bienvenido, eres administrador</h1>
 <p>La sesión de administrador está activa.</p>
 
 <div class="d-flex flex-wrap gap-2 mb-3">
@@ -22,6 +22,18 @@
        asp-action="Index"
        class="btn btn-primary">
         Administrar dirigentes políticos
+    </a>
+
+    <a asp-controller="Elections"
+       asp-action="Index"
+       class="btn btn-primary">
+        Elecciones
+
+        <a asp-controller="Citizens"
+   asp-action="Index"
+   class="btn btn-primary">
+    Administrar ciudadanos
+</a>
     </a>
 </div>
 

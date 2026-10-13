@@ -1,0 +1,158 @@
+﻿@model Electium.Web.ViewModels.CreateNominationViewModel
+
+@{
+    ViewData["Title"] = "Nueva asignación";
+}
+
+<h1>Nueva asignación</h1>
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+@if (Model.ActivePositions.Count == 0)
+{
+    <div class="alert alert-info" role="alert">
+        No hay puestos activos disponibles para asignar.
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Volver a asignaciones
+    </a>
+}
+else
+{
+    <form asp-action="Review" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="ElectivePositionId" class="form-label">
+                Puesto electivo
+            </label>
+
+            <select asp-for="ElectivePositionId"
+                    asp-items="Model.ActivePositions"
+                    class="form-select"
+                    id="positionSelect">
+                <option value="0">Selecciona un puesto</option>
+            </select>
+
+            <span asp-validation-for="ElectivePositionId"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CandidateId" class="form-label">
+                Candidato
+            </label>
+
+            <select asp-for="CandidateId"
+                    class="form-select"
+                    id="candidateSelect"
+                    disabled>
+                <option value="0">Primero selecciona un puesto</option>
+            </select>
+
+            <span asp-validation-for="CandidateId"
+                  class="text-danger"></span>
+
+            <div id="candidateHelp" class="form-text">
+                Los candidatos de partidos aliados solo estarán disponibles
+                para los puestos para los que fueron postulados por su partido.
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Revisar asignación
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Cancelar
+        </a>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const positionSelect =
+            document.getElementById("positionSelect");
+
+        const candidateSelect =
+            document.getElementById("candidateSelect");
+
+        const candidateHelp =
+            document.getElementById("candidateHelp");
+
+        const candidatesUrl =
+            '@Url.Action("CandidatesForPosition", "LeaderNominations")';
+
+        positionSelect?.addEventListener("change", async () => {
+            candidateSelect.innerHTML =
+                '<option value="0">Cargando candidatos...</option>';
+            candidateSelect.disabled = true;
+            candidateHelp.textContent = "";
+
+            if (!positionSelect.value || positionSelect.value === "0") {
+                candidateSelect.innerHTML =
+                    '<option value="0">Primero selecciona un puesto</option>';
+
+                candidateHelp.textContent =
+                    "Selecciona un puesto para consultar los candidatos disponibles.";
+
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${candidatesUrl}?electivePositionId=${encodeURIComponent(positionSelect.value)}`);
+
+                let result;
+
+                try {
+                    result = await response.json();
+                } catch {
+                    result = null;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        result?.message ||
+                        "No se pudieron cargar los candidatos.");
+                }
+
+                const candidates = Array.isArray(result) ? result : [];
+
+                candidateSelect.innerHTML =
+                    '<option value="0">Selecciona un candidato</option>';
+
+                for (const candidate of candidates) {
+                    const option = document.createElement("option");
+                    option.value = candidate.id;
+                    option.textContent =
+                        `${candidate.fullName} — ${candidate.originPartyName}`;
+
+                    candidateSelect.appendChild(option);
+                }
+
+                if (candidates.length === 0) {
+                    candidateSelect.innerHTML =
+                        '<option value="0">No hay candidatos disponibles para este puesto</option>';
+
+                    candidateHelp.textContent =
+                        "Comprueba que existan candidatos activos y que los candidatos aliados tengan una postulación activa para este mismo puesto.";
+
+                    return;
+                }
+
+                candidateSelect.disabled = false;
+            } catch (error) {
+                candidateSelect.innerHTML =
+                    '<option value="0">No se pudieron cargar los candidatos</option>';
+
+                candidateHelp.textContent =
+                    error.message ||
+                    "Ocurrió un error al consultar los candidatos.";
+            }
+        });
+    </script>
+}

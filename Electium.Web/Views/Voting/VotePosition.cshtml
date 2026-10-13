@@ -1,0 +1,92 @@
+﻿@model Electium.Web.ViewModels.VoterPositionViewModel
+
+@{
+    ViewData["Title"] = $"Votar: {Model.PositionName}";
+}
+
+<h1>@Model.PositionName</h1>
+<p>Elección: @Model.ElectionName</p>
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+<form asp-action="SubmitSelection" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden"
+           name="ElectivePositionId"
+           value="@Model.ElectivePositionId" />
+
+    @if (Model.Candidates.Count == 0)
+    {
+        <div class="alert alert-warning" role="alert">
+            No hay candidatos registrados para este puesto. Puedes seleccionar
+            Ninguno para completar la boleta.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+            @foreach (var candidate in Model.Candidates)
+            {
+                <div class="col">
+                    <label class="card h-100">
+                        <div class="card-body d-flex gap-3 align-items-center">
+                            <input type="radio"
+                                   name="ElectionCandidateId"
+                                   value="@candidate.ElectionCandidateId"
+                                   checked="@(Model.SelectedElectionCandidateId ==
+                                              candidate.ElectionCandidateId)" />
+
+                            <img src="@candidate.PhotoPath"
+                                 alt="Foto de @candidate.FirstName @candidate.LastName"
+                                 class="rounded-circle"
+                                 style="width:72px;height:72px;object-fit:cover" />
+
+                            <div>
+                                <h2 class="h6 mb-1">
+                                    @candidate.FirstName @candidate.LastName
+                                </h2>
+
+                                <div>
+                                    <img src="@candidate.PartyLogoPath"
+                                         alt="Logo de @candidate.PartyName"
+                                         style="width:32px;height:32px;object-fit:contain"
+                                         class="me-1" />
+
+                                    @candidate.PartyName
+                                    (@candidate.PartyAcronym)
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="form-check mb-4">
+        <input class="form-check-input"
+               type="radio"
+               name="IsNone"
+               value="true"
+               id="noneOption"
+               checked="@Model.IsNoneSelected" />
+
+        <label class="form-check-label" for="noneOption">
+            Ninguno
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Guardar selección
+    </button>
+
+    <a asp-action="Positions" class="btn btn-secondary">
+        Volver a puestos
+    </a>
+</form>

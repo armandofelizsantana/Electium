@@ -1,0 +1,87 @@
+﻿@model Electium.Web.ViewModels.NominationIndexViewModel
+
+@{
+    ViewData["Title"] = "Asignaciones de candidatos";
+}
+
+<h1>Asignar candidato a puesto</h1>
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (Model.HasActiveElection)
+{
+    <div class="alert alert-warning" role="alert">
+        Las asignaciones no se pueden modificar mientras haya una elección activa.
+    </div>
+}
+else
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            Nueva asignación
+        </a>
+    </p>
+}
+
+@if (Model.Nominations.Count == 0)
+{
+    <p>Tu partido todavía no tiene asignaciones registradas.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Candidato</th>
+                    <th>Partido de origen</th>
+                    <th>Puesto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var nomination in Model.Nominations)
+                {
+                    <tr>
+                        <td>
+                            <img src="@nomination.CandidatePhotoPath"
+                                 alt="Foto de @nomination.CandidateFullName"
+                                 style="width:48px;height:48px;object-fit:cover"
+                                 class="rounded-circle me-2" />
+                            @nomination.CandidateFullName
+                        </td>
+                        <td>@nomination.CandidatePartyName</td>
+                        <td>@nomination.ElectivePositionName</td>
+                        <td>
+                            @(nomination.IsActive ? "Activa" : "Retirada")
+                        </td>
+                        <td>
+                            @if (nomination.IsActive &&
+                                 !Model.HasActiveElection)
+                            {
+                                <a asp-action="ConfirmDeactivate"
+                                   asp-route-id="@nomination.Id"
+                                   class="btn btn-sm btn-outline-danger">
+                                    Retirar asignación
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

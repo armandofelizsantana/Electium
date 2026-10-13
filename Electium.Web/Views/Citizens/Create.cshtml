@@ -1,0 +1,44 @@
+﻿@model Electium.Web.ViewModels.CreateCitizenViewModel
+
+@{
+    ViewData["Title"] = "Crear ciudadano";
+}
+
+<h1>Crear ciudadano</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label">Nombre</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Apellido</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Correo electrónico</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IdentityNumber" class="form-label">
+            Número del documento de identidad
+        </label>
+        <input asp-for="IdentityNumber" class="form-control" />
+        <span asp-validation-for="IdentityNumber" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear ciudadano</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

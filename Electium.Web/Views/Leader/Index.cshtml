@@ -3,12 +3,31 @@
 }
 
 <h1>Inicio del dirigente politico</h1>
+@if (TempData["Error"] is string errorMessage)
+{
+    <div class="alert alert-warning" role="alert">
+        @errorMessage
+    </div>
+}
+
+@if (TempData["Success"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
 <p>La sesion del dirigente esta activa.</p>
 
 <a asp-controller="Candidates"
    asp-action="Index"
    class="btn btn-primary">
     Candidatos
+</a>
+
+<a asp-controller="LeaderNominations"
+   asp-action="Index"
+   class="btn btn-primary">
+    Asignar candidato a puesto
 </a>
 
 <form asp-controller="Account" asp-action="Logout" method="post">

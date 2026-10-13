@@ -22,6 +22,8 @@ public class TesseractIdentityDocumentOcrService
 
         // El directorio base es la carpeta de salida de Electium.Web.
         // Allí debe existir la subcarpeta tessdata.
+        // TesseractOCR busca el archivo de idioma directamente dentro
+        // del directorio que se le pasa al motor.
         var applicationBasePath = AppContext.BaseDirectory;
         var languageDataPath = Path.Combine(
             applicationBasePath,
@@ -34,9 +36,12 @@ public class TesseractIdentityDocumentOcrService
                 $"No se encontró el archivo de idioma OCR: {languageDataPath}");
         }
 
-        // Tesseract recibe el directorio padre que contiene "tessdata".
-        using var engine = new Engine(
+        var tessdataPath = Path.Combine(
             applicationBasePath,
+            "tessdata");
+
+        using var engine = new Engine(
+            tessdataPath,
             Language.SpanishCastilian,
             EngineMode.LstmOnly);
 
