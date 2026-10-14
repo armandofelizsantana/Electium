@@ -19,4 +19,8 @@ public interface IPoliticalLeaderService
         int id,
         bool isActive,
         CancellationToken cancellationToken = default);
+
+    Task<PoliticalLeaderDto?> GetByIdAsync(
+    int id,
+    CancellationToken cancellationToken = default);
 }

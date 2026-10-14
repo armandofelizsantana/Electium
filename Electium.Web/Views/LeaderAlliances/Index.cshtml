@@ -106,18 +106,28 @@
                             <td>
                                 @(request.Status switch
                                 {
-                                    AllianceRequestStatus.Pending => "En espera de respuesta",
-                                    AllianceRequestStatus.Accepted => "Aceptada",
-                                    AllianceRequestStatus.Rejected => "Rechazada",
+                                    AllianceRequestStatus.Pending
+                                        => "En espera de respuesta",
+                                    AllianceRequestStatus.Accepted
+                                        => "Aceptada",
+                                    AllianceRequestStatus.Rejected
+                                        => "Rechazada",
                                     _ => "Desconocido"
                                 })
                             </td>
                             <td>
-                                <a asp-action="ConfirmDelete"
-                                   asp-route-id="@request.Id"
-                                   class="btn btn-sm btn-outline-danger">
-                                    Retirar solicitud
-                                </a>
+                                @if (request.Status == AllianceRequestStatus.Accepted)
+                                {
+                                    <span class="text-muted">Alianza vigente</span>
+                                }
+                                else
+                                {
+                                    <a asp-action="ConfirmDelete"
+                                       asp-route-id="@request.Id"
+                                       class="btn btn-sm btn-outline-danger">
+                                        Retirar solicitud
+                                    </a>
+                                }
                             </td>
                         </tr>
                     }

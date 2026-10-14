@@ -1,47 +1,154 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Electium.Application.Security
+
+@{
+    var currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString();
+
+    var currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString();
+
+    var isLoginPage =
+        currentController == "Account" &&
+        currentAction == "Login";
+}
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Electium.Web</title>
+    <title>@ViewData["Title"] - Electium</title>
+
     <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Electium.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Electium.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+<body class="app-body">
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg app-navbar">
+            <div class="container app-container">
+                <a class="navbar-brand app-brand"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <span class="brand-mark" aria-hidden="true">E</span>
+                    <span>Electium</span>
+                </a>
+
+                @if (isLoginPage)
+                {
+                    <div class="ms-auto">
+                        <a class="btn btn-sm btn-outline-light app-login-link"
+                           asp-controller="Voting"
+                           asp-action="Index">
+                            Participar en la elección
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <button class="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mainNavigation"
+                            aria-controls="mainNavigation"
+                            aria-expanded="false"
+                            aria-label="Mostrar navegación">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNavigation">
+                        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                            @if (User.IsInRole(RoleNames.Administrator))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link app-nav-link"
+                                       asp-controller="Admin"
+                                       asp-action="Index">
+                                        Panel de administración
+                                    </a>
+                                </li>
+                            }
+                            else if (User.IsInRole(RoleNames.PoliticalLeader))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link app-nav-link"
+                                       asp-controller="Leader"
+                                       asp-action="Index">
+                                        Mi portal
+                                    </a>
+                                </li>
+                            }
+                            else if (User.Identity?.IsAuthenticated != true)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link app-nav-link"
+                                       asp-controller="Voting"
+                                       asp-action="Index">
+                                        Participar en la elección
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="btn btn-sm btn-outline-light app-login-link"
+                                       asp-controller="Account"
+                                       asp-action="Login">
+                                        Iniciar sesión
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="nav-item">
+                                <a class="nav-link app-nav-link"
+                                   asp-controller="Home"
+                                   asp-action="Privacy">
+                                    Privacidad
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Electium.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main" class="container app-container app-main">
+        @if (!isLoginPage &&
+             User.IsInRole(RoleNames.Administrator) &&
+             currentController != "Admin")
+        {
+            <div class="page-return">
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    ← Volver al panel de administración
+                </a>
+            </div>
+        }
+        else if (!isLoginPage &&
+                 User.IsInRole(RoleNames.PoliticalLeader) &&
+                 currentController != "Leader")
+        {
+            <div class="page-return">
+                <a asp-controller="Leader"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    ← Volver al portal del dirigente
+                </a>
+            </div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer">
+        <div class="container app-container">
+            <span>&copy; @DateTime.Now.Year Electium</span>
+            <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

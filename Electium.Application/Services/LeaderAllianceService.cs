@@ -188,9 +188,9 @@ public class LeaderAllianceService : ILeaderAllianceService
     }
 
     public async Task<bool> DeleteOutgoingRequestAsync(
-        int leaderUserId,
-        int requestId,
-        CancellationToken cancellationToken = default)
+    int leaderUserId,
+    int requestId,
+    CancellationToken cancellationToken = default)
     {
         await EnsureThereIsNoActiveElectionAsync(cancellationToken);
 
@@ -208,7 +208,14 @@ public class LeaderAllianceService : ILeaderAllianceService
             return false;
         }
 
-        // Eliminación lógica: se conserva el historial.
+        if (request.Status == AllianceRequestStatus.Accepted)
+        {
+            throw new BusinessRuleException(
+                "La solicitud ya fue aceptada y no se puede retirar. " +
+                "La alianza continúa vigente.");
+        }
+
+       
         request.IsActive = false;
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

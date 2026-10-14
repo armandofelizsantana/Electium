@@ -24,14 +24,7 @@ public class VoterBallotService : IVoterBallotService
         _unitOfWork = unitOfWork;
         _emailSender = emailSender;
     }
-    public VoterBallotService(
-        IVoterBallotRepository repository,
-        IUnitOfWork unitOfWork)
-    {
-        _repository = repository;
-        _unitOfWork = unitOfWork;
-    }
-
+  
     public Task<VoterBallotDto?> GetActiveBallotAsync(
         int electionId,
         CancellationToken cancellationToken = default)

@@ -53,6 +53,15 @@ public class ElectionsController : Controller
             return View(viewModel);
         }
 
+        if (viewModel.ElectionDateLocal!.Value.Date < DateTime.Today)
+        {
+            ModelState.AddModelError(
+                nameof(viewModel.ElectionDateLocal),
+                "La fecha de realización no puede ser anterior a hoy.");
+
+            return View(viewModel);
+        }
+
         var dto = _mapper.Map<CreateElectionDto>(viewModel);
 
         try

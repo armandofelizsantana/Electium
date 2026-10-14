@@ -57,6 +57,39 @@ public class PoliticalLeaderService : IPoliticalLeaderService
             .ToList();
     }
 
+    public async Task<PoliticalLeaderDto?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user is null ||
+            !await _userManager.IsInRoleAsync(
+                user,
+                RoleNames.PoliticalLeader))
+        {
+            return null;
+        }
+
+        var party = user.PoliticalPartyId.HasValue
+            ? await _partyRepository.GetByIdAsync(
+                user.PoliticalPartyId.Value,
+                cancellationToken)
+            : null;
+
+        return new PoliticalLeaderDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserName = user.UserName ?? string.Empty,
+            Email = user.Email ?? string.Empty,
+            PoliticalPartyId = user.PoliticalPartyId,
+            PoliticalPartyName = party?.Name,
+            IsActive = user.IsActive
+        };
+    }
+
     public async Task<PoliticalLeaderDto> CreateAsync(
         CreatePoliticalLeaderDto dto,
         CancellationToken cancellationToken = default)

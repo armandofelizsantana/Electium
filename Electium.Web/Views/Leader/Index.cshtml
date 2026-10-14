@@ -1,8 +1,11 @@
-﻿@{
+﻿@model Electium.Web.ViewModels.LeaderDashboardViewModel
+
+@{
     ViewData["Title"] = "Inicio del dirigente";
 }
 
-<h1>Inicio del dirigente politico</h1>
+<h1>Inicio del dirigente político</h1>
+
 @if (TempData["Error"] is string errorMessage)
 {
     <div class="alert alert-warning" role="alert">
@@ -16,29 +19,38 @@
         @successMessage
     </div>
 }
-<p>La sesion del dirigente esta activa.</p>
 
-<a asp-controller="Candidates"
-   asp-action="Index"
-   class="btn btn-primary">
-    Candidatos
-</a>
+<p>La sesión del dirigente está activa, @Model.FullName.</p>
 
-<a asp-controller="LeaderNominations"
-   asp-action="Index"
-   class="btn btn-primary">
-    Asignar candidato a puesto
+<div class="alert alert-info" role="status">
+    <strong>Partido asignado:</strong>
+    @(string.IsNullOrWhiteSpace(Model.PoliticalPartyName)
+        ? "No hay un partido asignado a esta cuenta."
+        : Model.PoliticalPartyName)
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-controller="Candidates"
+       asp-action="Index"
+       class="btn btn-primary">
+        Candidatos
+    </a>
+
+    <a asp-controller="LeaderNominations"
+       asp-action="Index"
+       class="btn btn-primary">
+        Asignar candidato a puesto
+    </a>
 
     <a asp-controller="LeaderAlliances"
-   asp-action="Index"
-   class="btn btn-primary">
-    Alianzas políticas
-
-</a>
-</a>
+       asp-action="Index"
+       class="btn btn-primary">
+        Alianzas políticas
+    </a>
+</div>
 
 <form asp-controller="Account" asp-action="Logout" method="post">
     <button type="submit" class="btn btn-outline-secondary">
-        Cerrar sesion
+        Cerrar sesión
     </button>
 </form>

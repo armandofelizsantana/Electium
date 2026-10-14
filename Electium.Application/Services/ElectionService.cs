@@ -19,20 +19,6 @@ public class ElectionService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-
-    public Task<ElectionResultsDto?> GetResultsAsync(
-    int electionId,
-    CancellationToken cancellationToken = default)
-    {
-        return _repository.GetResultsAsync(electionId, cancellationToken);
-    }
-
-    public Task<IReadOnlyList<ElectionSummaryDto>> GetSummariesAsync(
-    CancellationToken cancellationToken = default)
-    {
-        return _repository.GetElectionSummariesAsync(cancellationToken);
-    }
-
     public ElectionService(
         IElectionRepository repository,
         IUnitOfWork unitOfWork,
@@ -42,6 +28,22 @@ public class ElectionService
         _repository = repository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+    }
+
+    public Task<ElectionResultsDto?> GetResultsAsync(
+        int electionId,
+        CancellationToken cancellationToken = default)
+    {
+        return _repository.GetResultsAsync(
+            electionId,
+            cancellationToken);
+    }
+
+    public Task<IReadOnlyList<ElectionSummaryDto>> GetSummariesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        return _repository.GetElectionSummariesAsync(
+            cancellationToken);
     }
 
     public override async Task<ElectionDto> CreateAsync(
@@ -59,6 +61,8 @@ public class ElectionService
             throw new BusinessRuleException(
                 "La fecha de realización de la elección es obligatoria.");
         }
+
+        EnsureElectionDateIsNotInThePast(dto.StartsAtUtc);
 
         var readiness = await _repository.GetCreationReadinessAsync(
             cancellationToken);
@@ -143,6 +147,8 @@ public class ElectionService
                 "La fecha de realización de la elección es obligatoria.");
         }
 
+        EnsureElectionDateIsNotInThePast(dto.StartsAtUtc);
+
         dto.Name = dto.Name.Trim();
         dto.Year = dto.StartsAtUtc.ToLocalTime().Year;
 
@@ -184,9 +190,17 @@ public class ElectionService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
+    }
 
+    private static void EnsureElectionDateIsNotInThePast(
+        DateTime startsAtUtc)
+    {
+        var electionDateLocal = startsAtUtc.ToLocalTime().Date;
 
-
-
+        if (electionDateLocal < DateTime.Today)
+        {
+            throw new BusinessRuleException(
+                "La fecha de realización no puede ser anterior a hoy.");
+        }
     }
 }

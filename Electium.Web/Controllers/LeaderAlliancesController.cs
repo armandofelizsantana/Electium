@@ -7,6 +7,7 @@ using Electium.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Electium.Domain.Enums;
 
 namespace Electium.Web.Controllers;
 
@@ -165,6 +166,14 @@ public class LeaderAlliancesController : Controller
         if (request is null)
         {
             return NotFound();
+        }
+
+        if (request.Status == AllianceRequestStatus.Accepted)
+        {
+            TempData["Error"] =
+                "La solicitud ya fue aceptada y la alianza continúa vigente.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         return View(new ConfirmDeleteAllianceRequestViewModel

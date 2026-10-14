@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Crear elección";
+    var earliestElectionDate = DateTime.Today.ToString("yyyy-MM-dd");
 }
 
 <h1>Iniciar nuevo proceso electoral</h1>
@@ -30,6 +31,7 @@
         <label asp-for="ElectionDateLocal" class="form-label"></label>
         <input asp-for="ElectionDateLocal"
                type="date"
+               min="@earliestElectionDate"
                class="form-control" />
         <span asp-validation-for="ElectionDateLocal"
               class="text-danger"></span>
