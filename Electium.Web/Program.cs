@@ -9,6 +9,8 @@ using Electium.Web.Data;
 using Electium.Web.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Electium.Shared.Services;
+using Electium.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,7 @@ builder.Services.AddAutoMapper(
     typeof(ElectivePositionWebMappingProfile),
     typeof(PoliticalPartyWebMappingProfile),
     typeof(CandidateWebMappingProfile),
+    typeof(LeaderAllianceWebMappingProfile),
     typeof(VoterBallotWebMappingProfile));
 
 builder.Services.AddScoped<
@@ -101,6 +104,16 @@ builder.Services.AddScoped<IElectionRepository, ElectionRepository>();
 builder.Services.AddScoped<IElectionService, ElectionService>();
 
 builder.Services.AddScoped<
+    ILeaderAllianceRepository,
+    LeaderAllianceRepository>();
+
+builder.Services.AddScoped<
+    ILeaderAllianceService,
+    LeaderAllianceService>();
+
+// linea
+
+builder.Services.AddScoped<
     IPoliticalPartyRepository,
     PoliticalPartyRepository>();
 
@@ -129,6 +142,16 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+var smtpSettings = builder.Configuration
+    .GetSection("Smtp")
+    .Get<SmtpEmailSettings>() ?? new SmtpEmailSettings();
+
+builder.Services.AddSingleton(smtpSettings);
+
+builder.Services.AddScoped<
+    IVoteReceiptEmailSender,
+    MailKitVoteReceiptEmailSender>();
 
 var app = builder.Build();
 

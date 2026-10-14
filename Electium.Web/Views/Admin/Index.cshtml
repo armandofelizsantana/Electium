@@ -1,15 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Bienvenido, eres administrador";
+﻿@model Electium.Web.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Inicio del administrador";
 }
 
 <h1>Bienvenido, eres administrador</h1>
 <p>La sesión de administrador está activa.</p>
 
-<div class="d-flex flex-wrap gap-2 mb-3">
+<div class="d-flex flex-wrap gap-2 mb-4">
     <a asp-controller="ElectivePositions"
        asp-action="Index"
        class="btn btn-primary">
         Administrar puestos electivos
+    </a>
+
+    <a asp-controller="Citizens"
+       asp-action="Index"
+       class="btn btn-primary">
+        Administrar ciudadanos
     </a>
 
     <a asp-controller="PoliticalParties"
@@ -28,14 +36,90 @@
        asp-action="Index"
        class="btn btn-primary">
         Elecciones
-
-        <a asp-controller="Citizens"
-   asp-action="Index"
-   class="btn btn-primary">
-    Administrar ciudadanos
-</a>
     </a>
 </div>
+
+<section class="mb-4">
+    <h2>Resumen electoral</h2>
+
+    @if (Model.AvailableYears.Count == 0)
+    {
+        <p>No hay elecciones registradas para resumir.</p>
+    }
+    else
+    {
+        <form asp-controller="Admin"
+              asp-action="Index"
+              method="get"
+              class="row g-2 align-items-end mb-3">
+
+            <div class="col-auto">
+                <label for="year" class="form-label">Año de la elección</label>
+
+                <select id="year" name="year" class="form-select">
+                    @foreach (var availableYear in Model.AvailableYears)
+                    {
+                        if (availableYear == Model.SelectedYear)
+                        {
+                            <option value="@availableYear" selected>
+                                @availableYear
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@availableYear">
+                                @availableYear
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    Obtener resumen electoral
+                </button>
+            </div>
+        </form>
+
+        @if (Model.ElectionSummaries.Count == 0)
+        {
+            <p>No hay elecciones registradas para el año seleccionado.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Elección</th>
+                            <th>Fecha</th>
+                            <th>Partidos</th>
+                            <th>Candidatos</th>
+                            <th>Votos emitidos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var election in Model.ElectionSummaries)
+                        {
+                            <tr>
+                                <td>@election.Name</td>
+                                <td>
+                                    @(election.StartsAtUtc
+                                        .ToLocalTime()
+                                        .ToString("dd/MM/yyyy"))
+                                </td>
+                                <td>@election.PoliticalPartyCount</td>
+                                <td>@election.CandidateCount</td>
+                                <td>@election.TotalVoteCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+</section>
 
 <form asp-controller="Account" asp-action="Logout" method="post">
     <button type="submit" class="btn btn-outline-secondary">

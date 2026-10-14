@@ -1,0 +1,45 @@
+﻿@model Electium.Web.ViewModels.CreateAllianceRequestViewModel
+
+@{
+    ViewData["Title"] = "Nueva solicitud de alianza";
+}
+
+<h1>Nueva solicitud de alianza</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @if (!Model.AvailableParties.Any())
+    {
+        <div class="alert alert-info">
+            No hay partidos disponibles para solicitar una alianza.
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <label asp-for="ReceivingPartyId" class="form-label">
+                Partido político
+            </label>
+
+            <select asp-for="ReceivingPartyId"
+                    asp-items="Model.AvailableParties"
+                    class="form-select">
+                <option value="">Selecciona un partido</option>
+            </select>
+
+            <span asp-validation-for="ReceivingPartyId"
+                  class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Enviar solicitud
+        </button>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

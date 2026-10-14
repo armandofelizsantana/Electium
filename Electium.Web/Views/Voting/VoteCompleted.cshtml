@@ -6,6 +6,19 @@
 
 <h1>Voto registrado</h1>
 
+@if (Model.EmailSent)
+{
+    <div class="alert alert-info" role="alert">
+        Enviamos el resumen de tus selecciones a tu correo electrónico.
+    </div>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Tu voto quedó registrado, pero no pudimos enviar el correo con el resumen.
+    </div>
+}
+
 <div class="alert alert-success" role="alert">
     Tu voto para la elección <strong>@Model.ElectionName</strong>
     se registró correctamente.

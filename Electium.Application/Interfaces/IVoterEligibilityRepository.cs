@@ -10,4 +10,6 @@ public interface IVoterEligibilityRepository
     Task<VoterEligibilityDto> CheckEligibilityAsync(
         string identityNumber,
         CancellationToken cancellationToken = default);
+
+    
 }

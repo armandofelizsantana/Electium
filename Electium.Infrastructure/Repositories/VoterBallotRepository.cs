@@ -134,4 +134,18 @@ public class VoterBallotRepository : IVoterBallotRepository
             participation,
             cancellationToken);
     }
+
+    public Task<string?> GetCitizenEmailAsync(
+    int citizenId,
+    CancellationToken cancellationToken = default)
+    {
+        return _context.Citizens
+            .AsNoTracking()
+            .Where(citizen =>
+                citizen.Id == citizenId &&
+                citizen.IsActive)
+            .Select(citizen => citizen.Email)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+       
 }

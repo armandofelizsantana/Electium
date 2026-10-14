@@ -1,0 +1,30 @@
+﻿@model Electium.Web.ViewModels.ConfirmAllianceResponseViewModel
+
+@{
+    ViewData["Title"] = Model.Accept
+        ? "Confirmar aceptación"
+        : "Confirmar rechazo";
+
+    var actionText = Model.Accept ? "aceptar" : "rechazar";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    ¿Está seguro de que desea @actionText la solicitud de alianza con
+    <strong>@Model.OtherPartyName (@Model.OtherPartyAcronym)</strong>?
+</p>
+
+<form asp-action="Respond" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <input type="hidden"
+           name="accept"
+           value="@Model.Accept.ToString().ToLowerInvariant()" />
+
+    <button type="submit"
+            class="btn @(Model.Accept ? "btn-success" : "btn-danger")">
+        Confirmar
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

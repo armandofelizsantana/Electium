@@ -16,4 +16,6 @@ public interface IVoterBallotService
         int citizenId,
         IReadOnlyCollection<CastVoteSelectionDto> selections,
         CancellationToken cancellationToken = default);
+
+    
 }

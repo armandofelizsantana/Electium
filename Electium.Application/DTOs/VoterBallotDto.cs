@@ -22,7 +22,7 @@ public class VoterBallotPositionDto
 
     public int PoliticalPartyCount { get; set; }
 
-    // Cuenta personas candidatas distintas aunque compitan por varios partidos.
+ 
     public int CandidateCount { get; set; }
 
     public IReadOnlyList<VoterBallotCandidateDto> Candidates { get; set; }
@@ -31,7 +31,7 @@ public class VoterBallotPositionDto
 
 public class VoterBallotCandidateDto
 {
-    // Identifica la candidatura guardada como instantánea para esta elección.
+    
     public int ElectionCandidateId { get; set; }
 
     public int CandidateId { get; set; }

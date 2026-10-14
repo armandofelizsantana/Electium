@@ -14,4 +14,6 @@ public class VoteReceiptDto
 
     public IReadOnlyList<string> SelectionSummary { get; set; }
         = Array.Empty<string>();
+
+    public bool EmailSent { get; set; }
 }

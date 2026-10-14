@@ -137,18 +137,36 @@ public class ElectionRepository
             .Select(group => new
             {
                 ElectionId = group.Key,
+
                 PoliticalPartyCount = group
                     .Select(candidate => candidate.PoliticalPartyId)
                     .Distinct()
                     .Count(),
-                ElectivePositionCount = group
-                    .Select(candidate => candidate.ElectivePositionId)
+
+                CandidateCount = group
+                    .Select(candidate => candidate.CandidateId)
                     .Distinct()
                     .Count()
             })
             .ToListAsync(cancellationToken);
 
         var countsByElectionId = electionCounts
+            .ToDictionary(item => item.ElectionId);
+
+        var participationCounts = await _context.ElectionParticipations
+            .AsNoTracking()
+            .GroupBy(participation => participation.ElectionId)
+            .Select(group => new
+            {
+                ElectionId = group.Key,
+                TotalVoteCount = group
+                    .Select(participation => participation.CitizenId)
+                    .Distinct()
+                    .Count()
+            })
+            .ToListAsync(cancellationToken);
+
+        var participationsByElectionId = participationCounts
             .ToDictionary(item => item.ElectionId);
 
         var elections = await _context.Elections
@@ -165,6 +183,10 @@ public class ElectionRepository
                     election.Id,
                     out var counts);
 
+                participationsByElectionId.TryGetValue(
+                    election.Id,
+                    out var participations);
+
                 return new ElectionSummaryDto
                 {
                     Id = election.Id,
@@ -173,8 +195,12 @@ public class ElectionRepository
                     StartsAtUtc = election.StartsAtUtc,
                     Status = election.Status,
                     IsActive = election.IsActive,
-                    PoliticalPartyCount = counts?.PoliticalPartyCount ?? 0,
-                    ElectivePositionCount = counts?.ElectivePositionCount ?? 0
+                    PoliticalPartyCount =
+                        counts?.PoliticalPartyCount ?? 0,
+                    CandidateCount =
+                        counts?.CandidateCount ?? 0,
+                    TotalVoteCount =
+                        participations?.TotalVoteCount ?? 0
                 };
             })
             .ToList();

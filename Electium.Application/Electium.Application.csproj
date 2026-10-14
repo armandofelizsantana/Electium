@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Electium.Domain\Electium.Domain.csproj" />
-    <ProjectReference Include="..\Electium.Shared\Electium.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

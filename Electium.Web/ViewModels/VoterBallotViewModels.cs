@@ -70,4 +70,6 @@ public class VoteCompletedViewModel
     public DateTime SubmittedAtLocal { get; set; }
 
     public IReadOnlyList<string> SelectionSummary { get; set; } = [];
+
+    public bool EmailSent { get; set; }
 }

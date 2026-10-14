@@ -30,6 +30,7 @@ public class ElectionWebMappingProfile : Profile
         CreateMap<ElectionResultsDto, ElectionResultsViewModel>();
         CreateMap<ElectionPositionResultDto, ElectionPositionResultViewModel>();
         CreateMap<ElectionCandidateResultDto, ElectionCandidateResultViewModel>();
+        CreateMap<ElectionSummaryDto, AdminElectionSummaryViewModel>();
     }
 
     private static DateTime ToUtc(DateTime localDate)

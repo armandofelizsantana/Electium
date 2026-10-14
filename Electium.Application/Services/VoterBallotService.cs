@@ -13,6 +13,17 @@ public class VoterBallotService : IVoterBallotService
     private readonly IVoterBallotRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
 
+    private readonly IVoteReceiptEmailSender _emailSender;
+
+    public VoterBallotService(
+        IVoterBallotRepository repository,
+        IUnitOfWork unitOfWork,
+        IVoteReceiptEmailSender emailSender)
+    {
+        _repository = repository;
+        _unitOfWork = unitOfWork;
+        _emailSender = emailSender;
+    }
     public VoterBallotService(
         IVoterBallotRepository repository,
         IUnitOfWork unitOfWork)
@@ -40,6 +51,16 @@ public class VoterBallotService : IVoterBallotService
         {
             throw new BusinessRuleException(
                 "No se pudo identificar al ciudadano.");
+        }
+
+        var recipientEmail = await _repository.GetCitizenEmailAsync(
+    citizenId,
+    cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(recipientEmail))
+        {
+            throw new BusinessRuleException(
+                "El ciudadano no tiene un correo electrónico válido registrado.");
         }
 
         var ballotData = await _repository.GetActiveBallotAsync(
@@ -165,17 +186,22 @@ public class VoterBallotService : IVoterBallotService
             participation,
             cancellationToken);
 
-        // Se guarda la boleta, sus selecciones y la participación en una
-        // sola llamada a SaveChangesAsync, que EF Core ejecuta como operación
-        // transaccional para SQL Server.
+       
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new VoteReceiptDto
+        var receipt = new VoteReceiptDto
         {
             ElectionId = electionId,
             ElectionName = ballotData.ElectionName,
             SubmittedAtUtc = ballot.SubmittedAtUtc,
             SelectionSummary = receiptLines
         };
+
+        receipt.EmailSent = await _emailSender.SendAsync(
+            recipientEmail,
+            receipt,
+            cancellationToken);
+
+        return receipt;
     }
 }

@@ -1,0 +1,24 @@
+﻿@model Electium.Web.ViewModels.ConfirmDeleteAllianceRequestViewModel
+
+@{
+    ViewData["Title"] = "Retirar solicitud";
+}
+
+<h1>Retirar solicitud de alianza</h1>
+
+<p>
+    ¿Está seguro de que desea retirar la solicitud de alianza con
+    <strong>
+        @Model.ReceivingPartyName (@Model.ReceivingPartyAcronym)
+    </strong>?
+</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+
+    <button type="submit" class="btn btn-danger">
+        Confirmar retiro
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

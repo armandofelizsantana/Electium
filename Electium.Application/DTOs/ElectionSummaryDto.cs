@@ -22,4 +22,8 @@ public class ElectionSummaryDto
     public int PoliticalPartyCount { get; set; }
 
     public int ElectivePositionCount { get; set; }
+
+    public int CandidateCount { get; set; }
+
+    public int TotalVoteCount { get; set; }
 }

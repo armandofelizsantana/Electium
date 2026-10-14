@@ -23,4 +23,8 @@ public interface IVoterBallotRepository
         IReadOnlyList<VoteSelection> selections,
         ElectionParticipation participation,
         CancellationToken cancellationToken = default);
+
+    Task<string?> GetCitizenEmailAsync(
+    int citizenId,
+    CancellationToken cancellationToken = default);
 }
