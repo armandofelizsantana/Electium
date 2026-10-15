@@ -1,9 +1,40 @@
-﻿@{
+﻿@using Electium.Application.Security
+
+@{
     ViewData["Title"] = "Acceso denegado";
 }
 
 <h1>Acceso denegado</h1>
-<p>No tiene permisos para acceder a esta seccion</p>
-<a asp-controller="Home" asp-action="Index">
-    Ir a la pagina de inicio
-</a>
+
+<p>No tienes permisos para acceder a esta sección.</p>
+
+@if (User.IsInRole(RoleNames.Administrator))
+{
+    <a asp-controller="Admin"
+       asp-action="Index"
+       class="btn btn-primary">
+        Volver al panel de administración
+    </a>
+}
+else if (User.IsInRole(RoleNames.PoliticalLeader))
+{
+    <a asp-controller="Leader"
+       asp-action="Index"
+       class="btn btn-primary">
+        Volver al portal del dirigente
+    </a>
+}
+else
+{
+    <a asp-controller="Voting"
+       asp-action="Index"
+       class="btn btn-primary">
+        Participar en la elección
+    </a>
+
+    <a asp-controller="Account"
+       asp-action="Login"
+       class="btn btn-outline-secondary ms-2">
+        Acceder
+    </a>
+}

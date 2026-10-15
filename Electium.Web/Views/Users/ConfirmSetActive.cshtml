@@ -1,0 +1,36 @@
+﻿@model Electium.Web.ViewModels.ConfirmUserStatusViewModel
+
+@{
+    var operation = Model.IsActive ? "deactivate" : "activate";
+    var actionText = Model.IsActive ? "desactivar" : "activar";
+    var actionLabel = Model.IsActive ? "Desactivar" : "Activar";
+    ViewData["Title"] = $"{actionLabel} usuario";
+}
+
+<h1>@actionLabel usuario</h1>
+
+<div class="card">
+    <div class="card-body">
+        <p>
+            ¿Está seguro que desea @actionText al usuario
+            <strong>@Model.FirstName @Model.LastName</strong>
+            (@Model.UserName)?
+        </p>
+
+        <form asp-action="SetActive" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="operation" value="@operation" />
+
+            <button type="submit"
+                    class="btn @(Model.IsActive ? "btn-danger" : "btn-success")">
+                Aceptar
+            </button>
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>

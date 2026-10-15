@@ -10,6 +10,8 @@
     var isLoginPage =
         currentController == "Account" &&
         currentAction == "Login";
+
+    var isVotingPage = currentController == "Voting";
 }
 
 <!DOCTYPE html>
@@ -43,6 +45,38 @@
                            asp-controller="Voting"
                            asp-action="Index">
                             Participar en la elección
+                        </a>
+                    </div>
+                }
+                else if (isVotingPage)
+                {
+                    <div class="ms-auto d-flex align-items-center gap-3">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <form asp-controller="Account"
+                                  asp-action="Logout"
+                                  method="post"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-light app-login-link">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn btn-sm btn-outline-light app-login-link"
+                               asp-controller="Account"
+                               asp-action="Login">
+                                Acceder
+                            </a>
+                        }
+
+                        <a class="nav-link app-nav-link"
+                           asp-controller="Home"
+                           asp-action="Privacy">
+                            Privacidad
                         </a>
                     </div>
                 }
@@ -94,7 +128,7 @@
                                     <a class="btn btn-sm btn-outline-light app-login-link"
                                        asp-controller="Account"
                                        asp-action="Login">
-                                        Iniciar sesión
+                                        Acceder
                                     </a>
                                 </li>
                             }
@@ -115,6 +149,7 @@
 
     <main role="main" class="container app-container app-main">
         @if (!isLoginPage &&
+             !isVotingPage &&
              User.IsInRole(RoleNames.Administrator) &&
              currentController != "Admin")
         {
@@ -127,6 +162,7 @@
             </div>
         }
         else if (!isLoginPage &&
+                 !isVotingPage &&
                  User.IsInRole(RoleNames.PoliticalLeader) &&
                  currentController != "Leader")
         {
@@ -145,6 +181,7 @@
     <footer class="app-footer">
         <div class="container app-container">
             <span>&copy; @DateTime.Now.Year Electium</span>
+            <span>ReysonF.Dev Mat 2025-1386</span>
             <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
         </div>
     </footer>

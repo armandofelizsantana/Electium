@@ -27,6 +27,7 @@ public class ElectionWebMappingProfile : Profile
                 destination => destination.EndsAtUtc,
                 options => options.Ignore());
 
+        CreateMap<ElectionDto, ConfirmCompleteElectionViewModel>();
         CreateMap<ElectionResultsDto, ElectionResultsViewModel>();
         CreateMap<ElectionPositionResultDto, ElectionPositionResultViewModel>();
         CreateMap<ElectionCandidateResultDto, ElectionCandidateResultViewModel>();

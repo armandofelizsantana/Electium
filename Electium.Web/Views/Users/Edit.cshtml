@@ -1,13 +1,16 @@
-﻿@model Electium.Web.ViewModels.CreatePoliticalLeaderViewModel
+﻿@model Electium.Web.ViewModels.EditUserViewModel
 
 @{
-    ViewData["Title"] = "Crear dirigente";
+    ViewData["Title"] = "Editar usuario";
 }
 
-<h1>Crear dirigente político</h1>
+<h1>Editar usuario</h1>
+<p>Deja la contraseña vacía si no deseas cambiarla.</p>
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     <div class="mb-3">
         <label asp-for="FirstName" class="form-label">Nombre</label>
@@ -22,43 +25,41 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="UserName" class="form-label">Nombre de usuario</label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
         <label asp-for="Email" class="form-label">Correo electrónico</label>
         <input asp-for="Email" class="form-control" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="PoliticalPartyId" class="form-label">Partido activo</label>
-        <select asp-for="PoliticalPartyId"
-                asp-items="Model.ActiveParties"
-                class="form-select">
-            <option value="0">Selecciona un partido</option>
-        </select>
-        <span asp-validation-for="PoliticalPartyId" class="text-danger"></span>
+        <label asp-for="UserName" class="form-label">Nombre de usuario</label>
+        <input asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
-        <label asp-for="Password" class="form-label">Contraseña inicial</label>
+        <label asp-for="RoleName" class="form-label">Rol</label>
+        <select asp-for="RoleName" asp-items="Model.Roles" class="form-select">
+            <option value="">Selecciona un rol</option>
+        </select>
+        <span asp-validation-for="RoleName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label">Nueva contraseña</label>
         <input asp-for="Password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="ConfirmPassword" class="form-label">
-            Confirmar contraseña
+            Confirmar nueva contraseña
         </label>
         <input asp-for="ConfirmPassword" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Crear dirigente</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
 </form>
 
 @section Scripts {

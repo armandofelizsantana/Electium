@@ -1,0 +1,35 @@
+﻿@model Electium.Web.ViewModels.ConfirmRemoveLeaderPartyAssignmentViewModel
+
+@{
+    ViewData["Title"] = "Desvincular dirigente";
+}
+
+<h1>Desvincular dirigente</h1>
+
+<div class="card">
+    <div class="card-body">
+        <p>
+            ¿Está seguro que desea desvincular a
+            <strong>@Model.FirstName @Model.LastName</strong>
+            (@Model.UserName) del partido
+            <strong>@Model.PartyName (@Model.PartyAcronym)</strong>?
+        </p>
+
+        <p class="text-muted">
+            Al quedar sin partido asignado, el dirigente no podrá iniciar sesión
+            hasta que se le asigne otro.
+        </p>
+
+        <form asp-action="Remove" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden"
+                   name="leaderUserId"
+                   value="@Model.LeaderUserId" />
+
+            <button type="submit" class="btn btn-danger">Aceptar</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Cancelar
+            </a>
+        </form>
+    </div>
+</div>

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Electium.Web.Views.PoliticalLeaders
+namespace Electium.Web.Views.Users
 {
-    public class IndexModel : PageModel
+    public class ConfirmSetActiveModel : PageModel
     {
         public void OnGet()
         {

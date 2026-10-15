@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Electium.Application.DTOs;
 using Electium.Application.Exceptions;
@@ -206,13 +207,11 @@ public class VotingController : Controller
         try
         {
             var recognizedText = _ocrService.ReadText(imageBytes);
-            var expectedIdentity = Normalize(citizen.IdentityNumber);
-            var recognizedContent = Normalize(recognizedText);
+            var expectedIdentity = new string(
+                citizen.IdentityNumber.Where(char.IsDigit).ToArray());
 
             if (expectedIdentity.Length == 0 ||
-                !recognizedContent.Contains(
-                    expectedIdentity,
-                    StringComparison.Ordinal))
+                !ContainsIdentityNumber(recognizedText, expectedIdentity))
             {
                 ModelState.AddModelError(
                     nameof(viewModel.FrontImage),
@@ -676,13 +675,19 @@ public class VotingController : Controller
         };
     }
 
-    private static string Normalize(string value)
+    private static bool ContainsIdentityNumber(
+        string recognizedText,
+        string expectedIdentity)
     {
-        return new string(
-            value
-                .Where(char.IsLetterOrDigit)
-                .Select(char.ToUpperInvariant)
-                .ToArray());
+        // Acepta separadores impresos entre dígitos y evita aceptar el número
+        // cuando solo aparece como parte de una secuencia numérica más larga.
+        var digitPattern = string.Join(
+            @"[\s.\-/]*",
+            expectedIdentity.Select(digit => Regex.Escape(digit.ToString())));
+
+        return Regex.IsMatch(
+            recognizedText,
+            $@"(?<!\d){digitPattern}(?!\d)");
     }
 
     private static bool HasSupportedImageSignature(byte[] bytes)

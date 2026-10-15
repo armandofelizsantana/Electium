@@ -1,0 +1,62 @@
+﻿@model IEnumerable<Electium.Web.ViewModels.LeaderPartyAssignmentListViewModel>
+
+@{
+    ViewData["Title"] = "Asignación de dirigentes";
+}
+
+<h1>Asignación de dirigentes políticos</h1>
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">
+        Asignar dirigente a partido
+    </a>
+</p>
+
+@if (!Model.Any())
+{
+    <p>No hay dirigentes asignados a partidos.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Usuario dirigente</th>
+                    <th>Nombre</th>
+                    <th>Partido</th>
+                    <th>Siglas</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var assignment in Model)
+            {
+                <tr>
+                    <td>@assignment.UserName</td>
+                    <td>@assignment.FirstName @assignment.LastName</td>
+                    <td>@assignment.PartyName</td>
+                    <td>@assignment.PartyAcronym</td>
+                    <td>
+                        <a asp-action="ConfirmRemove"
+                           asp-route-leaderUserId="@assignment.LeaderUserId"
+                           class="btn btn-sm btn-outline-danger">
+                            Desvincular
+                        </a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

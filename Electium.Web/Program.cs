@@ -43,6 +43,9 @@ builder.Services.AddAutoMapper(
     typeof(PoliticalPartyWebMappingProfile),
     typeof(CandidateWebMappingProfile),
     typeof(LeaderAllianceWebMappingProfile),
+    typeof(UserManagementWebMappingProfile),
+    typeof(LeaderPartyAssignmentWebMappingProfile),
+    typeof(LeaderDashboardWebMappingProfile),
     typeof(VoterBallotWebMappingProfile));
 
 builder.Services.AddScoped<
@@ -110,6 +113,14 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     ILeaderAllianceService,
     LeaderAllianceService>();
+
+builder.Services.AddScoped<
+    IUserManagementService,
+    UserManagementService>();
+
+builder.Services.AddScoped<
+    ILeaderPartyAssignmentService,
+    LeaderPartyAssignmentService>();
 
 // linea
 

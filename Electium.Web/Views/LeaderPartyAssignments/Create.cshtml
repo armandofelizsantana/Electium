@@ -1,0 +1,55 @@
+﻿@model Electium.Web.ViewModels.CreateLeaderPartyAssignmentViewModel
+
+@{
+    ViewData["Title"] = "Asignar dirigente";
+}
+
+<h1>Asignar dirigente a partido</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="LeaderUserId" class="form-label">
+            Dirigente político
+        </label>
+        <select asp-for="LeaderUserId"
+                asp-items="Model.AvailableLeaders"
+                class="form-select">
+            <option value="0">Selecciona un dirigente</option>
+        </select>
+        <span asp-validation-for="LeaderUserId" class="text-danger"></span>
+
+        @if (!Model.AvailableLeaders.Any())
+        {
+            <div class="form-text">
+                No hay dirigentes activos sin partido asignado.
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PartyId" class="form-label">
+            Partido político
+        </label>
+        <select asp-for="PartyId"
+                asp-items="Model.ActiveParties"
+                class="form-select">
+            <option value="0">Selecciona un partido</option>
+        </select>
+        <span asp-validation-for="PartyId" class="text-danger"></span>
+
+        @if (!Model.ActiveParties.Any())
+        {
+            <div class="form-text">
+                No hay partidos activos disponibles.
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Crear relación
+    </button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Volver</a>
+</form>

@@ -100,7 +100,9 @@ public class ElectionsController : Controller
                 "Solo se puede finalizar una elección que esté en proceso.");
         }
 
-        return View(election);
+        var viewModel = _mapper.Map<ConfirmCompleteElectionViewModel>(election);
+
+        return View(viewModel);
     }
 
     [HttpPost]
